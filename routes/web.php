@@ -9,7 +9,7 @@ Route::get('/', function () {
 
 Route::get('/dashboard', function () {
     if (auth()->user()->role === 'trainer'){
-        return view('dashboard');
+        return view('trainer.dashboard');
     }
 
     return view('teacher.dashboard');
