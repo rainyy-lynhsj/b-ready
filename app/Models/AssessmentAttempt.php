@@ -9,14 +9,13 @@ class AssessmentAttempt extends Model
 {
     use HasFactory;
 
-    protected $fillable =[
+    protected $fillable = [
         'assessment_id',
         'teacher_id',
         'attempt_number',
         'score',
-        'total_points',
         'percentage',
-        'status',
+        'result',
         'started_at',
         'submitted_at',
     ];
@@ -25,11 +24,15 @@ class AssessmentAttempt extends Model
     {
         return [
             'score' => 'decimal:2',
-            'total_points' => 'decimal:2',
             'percentage' => 'decimal:2',
             'started_at' => 'datetime',
             'submitted_at' => 'datetime',
         ];
+    }
+
+    public function getTotalPointsAttribute(): float
+    {
+        return (float) ($this->assessment ? $this->assessment->questions->sum('points') : 100);
     }
 
     public function assessment()
@@ -53,6 +56,14 @@ class AssessmentAttempt extends Model
         return $this->hasMany(
             AssessmentAnswer::class,
             'attempt_id'
+        );
+    }
+
+    public function certification()
+    {
+        return $this->hasOne(
+            Certification::class,
+            'assessment_attempt_id'
         );
     }
 }

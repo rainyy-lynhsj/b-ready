@@ -1,0 +1,124 @@
+<x-dynamic-component component="layouts.teacher">
+    <x-slot name="title">Assessment Results &bull; {{ $workshop->title }}</x-slot>
+    <x-slot name="header">Assessment Feedback &bull; Attempt #{{ $attempt->attempt_number }}</x-slot>
+
+    <div class="max-w-3xl mx-auto space-y-6">
+        @php
+            $isPassed = $attempt->result === 'passed';
+            $passingScore = $attempt->assessment->passing_score;
+        @endphp
+
+        <!-- Main Results Banner -->
+        <div class="bg-white rounded-2xl border p-8 shadow-xs text-center space-y-4 {{ $isPassed ? 'border-emerald-200' : 'border-rose-200' }}">
+            <!-- Icon -->
+            <div class="mx-auto h-16 w-16 rounded-full flex items-center justify-center {{ $isPassed ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600' }}">
+                @if ($isPassed)
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                    </svg>
+                @else
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                @endif
+            </div>
+
+            <!-- Result Label -->
+            <div>
+                <span class="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider {{ $isPassed ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200' }}">
+                    {{ $isPassed ? 'Assessment Passed' : 'Assessment Failed' }}
+                </span>
+                <h2 class="mt-3 text-3xl font-black text-slate-900">
+                    {{ $attempt->percentage }}%
+                </h2>
+                <p class="text-xs text-slate-500 mt-1">
+                    Score: <strong>{{ $attempt->score }}</strong> / {{ $attempt->total_points }} points &bull; Required to pass: <strong>{{ $passingScore }}%</strong>
+                </p>
+            </div>
+
+            <!-- Descriptive Text -->
+            <p class="text-sm text-slate-600 max-w-lg mx-auto leading-relaxed">
+                @if ($isPassed)
+                    Congratulations! You have demonstrated exceptional competence in Disaster Risk Reduction and Management principles. Your accreditation has been officially issued.
+                @else
+                    You did not meet the {{ $passingScore }}% passing requirement on Attempt #{{ $attempt->attempt_number }}. Review the questions below to prepare for your next attempt.
+                @endif
+            </p>
+
+            <!-- Actions -->
+            <div class="pt-4 flex flex-wrap justify-center gap-3">
+                @if ($isPassed)
+                    <a href="{{ route('teacher.assessments.certificate', $workshop) }}" target="_blank"
+                       class="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs px-5 py-2.5 shadow-xs transition-colors">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138z"/>
+                        </svg>
+                        View Official Certificate
+                    </a>
+
+                    @if ($workshop->classroomPackage)
+                        <a href="{{ route('teacher.packages.show', $workshop->classroomPackage) }}"
+                           class="inline-flex items-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-5 py-2.5 shadow-xs transition-colors">
+                            Unlock Classroom Package &rarr;
+                        </a>
+                    @endif
+                @else
+                    @if ($attemptsLeft > 0)
+                        <a href="{{ route('teacher.assessments.show', $workshop) }}"
+                           class="inline-flex items-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-5 py-2.5 shadow-xs transition-colors">
+                            Retake Assessment ({{ $attemptsLeft }} {{ Str::plural('attempt', $attemptsLeft) }} left)
+                        </a>
+                    @else
+                        <span class="inline-block text-xs font-semibold text-rose-600 bg-rose-50 px-3 py-2 rounded-xl border border-rose-200">
+                            No remaining attempts left. Contact trainer for support.
+                        </span>
+                    @endif
+                    <a href="{{ route('teacher.workshops.show', $workshop) }}"
+                       class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white text-slate-700 font-bold text-xs px-4 py-2.5 hover:bg-slate-50 transition-colors">
+                        Review Syllabus
+                    </a>
+                @endif
+            </div>
+        </div>
+
+        <!-- Answers Review Section -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-xs space-y-4">
+            <h3 class="text-base font-bold text-slate-900 border-b border-slate-100 pb-3">
+                Question Breakdown
+            </h3>
+
+            <div class="space-y-4">
+                @foreach ($attempt->answers as $index => $answer)
+                    @php
+                        $q = $answer->question;
+                        $selectedChoice = $answer->choice;
+                        $isCorrect = $answer->is_correct;
+                    @endphp
+
+                    <div class="p-4 rounded-xl border {{ $isCorrect ? 'bg-emerald-50/30 border-emerald-200/60' : 'bg-rose-50/30 border-rose-200/60' }}">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="flex items-start gap-2.5">
+                                <span class="h-6 w-6 rounded-md flex items-center justify-center text-xs font-bold shrink-0 {{ $isCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800' }}">
+                                    {{ $index + 1 }}
+                                </span>
+                                <div>
+                                    <h4 class="text-xs font-bold text-slate-900">{{ $q->question_text }}</h4>
+                                    <div class="mt-2 text-xs">
+                                        <span class="text-slate-500">Your Answer:</span>
+                                        <span class="font-semibold {{ $isCorrect ? 'text-emerald-700' : 'text-rose-700' }}">
+                                            {{ $selectedChoice->choice_text ?? 'No answer provided' }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <span class="text-xs font-bold shrink-0 {{ $isCorrect ? 'text-emerald-700' : 'text-rose-600' }}">
+                                {{ $answer->points_earned }} / {{ $q->points }} pts
+                            </span>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+</x-dynamic-component>

@@ -13,18 +13,34 @@ class ModuleProgress extends Model
 
     protected $fillable = [
         'teacher_id',
+        'user_id',
         'module_id',
         'workshop_id',
+        'progress',
         'status',
-        'progress_percentage',
         'started_at',
         'completed_at'
     ];
 
+    protected static function booted()
+    {
+        static::saving(function ($model) {
+            if (empty($model->user_id) && ! empty($model->teacher_id)) {
+                $model->user_id = $model->teacher_id;
+            } elseif (empty($model->teacher_id) && ! empty($model->user_id)) {
+                $model->teacher_id = $model->user_id;
+            }
+
+            if ($model->status === 'completed' && ($model->progress === null || $model->progress < 100)) {
+                $model->progress = 100;
+            }
+        });
+    }
+
     protected function casts(): array
     {
         return [
-            'progress_percentage' => 'integer',
+            'progress' => 'integer',
             'started_at' => 'datetime',
             'completed_at' => 'datetime',
         ];

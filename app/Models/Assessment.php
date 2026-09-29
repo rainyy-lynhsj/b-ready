@@ -11,18 +11,38 @@ class Assessment extends Model
 
     protected $fillable = [
         'workshop_id',
+        'trainer_id',
         'title',
         'description',
         'passing_score',
         'time_limit',
-        'attempts_allowed',
+        'max_attempts',
+        'is_published',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'is_published' => 'boolean',
+            'passing_score' => 'integer',
+            'time_limit' => 'integer',
+            'max_attempts' => 'integer',
+        ];
+    }
 
     public function workshop()
     {
-        return $this->hasOne(
+        return $this->belongsTo(
             Workshop::class,
-            'assessment_id'
+            'workshop_id'
+        );
+    }
+
+    public function trainer()
+    {
+        return $this->belongsTo(
+            User::class,
+            'trainer_id'
         );
     }
 

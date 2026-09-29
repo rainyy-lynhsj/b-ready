@@ -12,11 +12,10 @@ class Material extends Model
     protected $fillable = [
         'module_id',
         'title',
-        'material_type',
+        'type',
         'file_path',
-        'original_filename',
+        'external_url',
         'description',
-        'sequence',
     ];
 
     /**

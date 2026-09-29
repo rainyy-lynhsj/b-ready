@@ -14,13 +14,25 @@ class WorkshopTeacher extends Model
     protected $fillable = [
         'workshop_id',
         'teacher_id',
+        'user_id',
         'status',
         'joined_at'
     ];
 
+    protected static function booted()
+    {
+        static::saving(function ($model) {
+            if (empty($model->user_id) && ! empty($model->teacher_id)) {
+                $model->user_id = $model->teacher_id;
+            } elseif (empty($model->teacher_id) && ! empty($model->user_id)) {
+                $model->teacher_id = $model->user_id;
+            }
+        });
+    }
+
     protected function casts(): array
     {
-        return[
+        return [
             'joined_at' => 'datetime',
         ];
     }

@@ -94,4 +94,28 @@ class User extends Authenticatable
             'teacher_id'
         );
     }
+
+    /**
+     * DRR Certifications awarded to this Teacher.
+     */
+    public function certifications()
+    {
+        return $this->hasMany(Certification::class, 'teacher_id');
+    }
+
+    /**
+     * Check if user is a trainer.
+     */
+    public function isTrainer(): bool
+    {
+        return $this->role === 'trainer';
+    }
+
+    /**
+     * Check if user is a teacher.
+     */
+    public function isTeacher(): bool
+    {
+        return $this->role === 'teacher';
+    }
 }

@@ -23,7 +23,7 @@ class Module extends Model
      */
     public function course()
     {
-        return $this->belongsTo(User::class, 'course_id');
+        return $this->belongsTo(Course::class, 'course_id');
     }
 
     /**
@@ -53,7 +53,7 @@ class Module extends Model
     {
         return $this->hasMany(
             ModuleProgress::class,
-            'module_id;'
+            'module_id'
         );
     }
 }

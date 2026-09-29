@@ -11,17 +11,18 @@ class Certification extends Model
 
     protected $fillable = [
         'teacher_id',
+        'workshop_id',
         'assessment_attempt_id',
         'certificate_number',
-        'badge_path',
-        'certificate_path',
-        'issued_at',
+        'badge_name',
+        'certificate_file',
+        'certified_at',
     ];
 
     protected function casts(): array
     {
         return [
-            'issued_at' => 'datetime',
+            'certified_at' => 'datetime',
         ];
     }
 
@@ -30,6 +31,14 @@ class Certification extends Model
         return $this->belongsTo(
             User::class,
             'teacher_id'
+        );
+    }
+
+    public function workshop()
+    {
+        return $this->belongsTo(
+            Workshop::class,
+            'workshop_id'
         );
     }
 

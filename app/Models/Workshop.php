@@ -10,12 +10,14 @@ class Workshop extends Model
     use HasFactory;
 
     protected $fillable = [
+        'course_id',
         'trainer_id',
         'title',
         'description',
         'start_date',
         'end_date',
         'registration_deadline',
+        'status',
         'assessment_id',
         'invite_link',
     ];
@@ -27,6 +29,11 @@ class Workshop extends Model
             'end_date' => 'datetime',
             'registration_deadline' => 'datetime',
         ];
+    }
+
+    public function course()
+    {
+        return $this->belongsTo(Course::class, 'course_id');
     }
 
     public function trainer()
@@ -47,7 +54,7 @@ class Workshop extends Model
     public function workshopTeachers()
     {
         return $this->hasMany(
-            WorkshopTeachers::class,
+            WorkshopTeacher::class,
             'workshop_id'
         );
     }
@@ -67,14 +74,58 @@ class Workshop extends Model
             'workshop_modules',
             'workshop_id',
             'module_id'
-        )->withPivot('sequence');
+        )->withPivot('sequence')->orderBy('workshop_modules.sequence');
+    }
+
+    /**
+     * Retrieve ordered modules for this workshop, preferring workshop_modules sequence or course modules.
+     */
+    public function getOrderedModulesAttribute()
+    {
+        if ($this->workshopModules()->exists()) {
+            return $this->modules;
+        }
+
+        return $this->course ? $this->course->modules->sortBy('sequence')->values() : collect();
     }
 
     public function assessment()
     {
-        return $this->belongsTo(
+        return $this->hasOne(
             Assessment::class,
-            'assessment_id'
+            'workshop_id'
+        );
+    }
+
+    public function classroomPackage()
+    {
+        return $this->hasOne(
+            ClassroomPackage::class,
+            'workshop_id'
+        );
+    }
+
+    public function certifications()
+    {
+        return $this->hasMany(
+            Certification::class,
+            'workshop_id'
+        );
+    }
+
+    public function implementations()
+    {
+        return $this->hasMany(
+            ClassroomImplementation::class,
+            'workshop_id'
+        );
+    }
+
+    public function moduleProgress()
+    {
+        return $this->hasMany(
+            ModuleProgress::class,
+            'workshop_id'
         );
     }
 }
