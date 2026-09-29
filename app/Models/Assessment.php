@@ -42,3 +42,9 @@ class Assessment extends Model
         );
     }
 }
+        'title',
+        'passing_score',
+        'time_limit',
+        'number_of_attempts',
+    ];
+}

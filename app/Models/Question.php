@@ -40,4 +40,5 @@ class Question extends Model
             'question_id'
         );
     }
+    //
 }
