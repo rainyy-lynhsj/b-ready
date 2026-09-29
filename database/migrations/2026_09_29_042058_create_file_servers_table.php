@@ -6,22 +6,19 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('questions', function (Blueprint $table) {
+        Schema::create('file_servers', function (Blueprint $table) {
             $table->id();
+            $table->string('title');
+            $table->string('file_path');
+            $table->string('file_type'); // pdf, mp4, jpg, png, etc.
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('questions');
+        Schema::dropIfExists('file_servers');
     }
 };
