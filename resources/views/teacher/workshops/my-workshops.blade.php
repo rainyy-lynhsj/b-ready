@@ -91,7 +91,7 @@
                                 @if ($item->next_module)
                                     <a href="{{ route('teacher.learning.module', [$item->workshop, $item->next_module]) }}"
                                        class="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-xl transition-colors shadow-xs">
-                                        Resume Module {{ $item->next_module->sequence }} &rarr;
+                                        {{ $item->completed_modules === 0 ? 'Start Module ' . $item->next_module->sequence : 'Resume Module ' . $item->next_module->sequence }} &rarr;
                                     </a>
                                 @else
                                     <a href="{{ route('teacher.assessments.show', $item->workshop) }}"

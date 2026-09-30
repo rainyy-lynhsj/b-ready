@@ -32,6 +32,7 @@ Route::middleware(['auth', 'verified', 'role:teacher'])->prefix('teacher')->name
     Route::get('/my-workshops', [\App\Http\Controllers\Teacher\WorkshopController::class, 'myWorkshops'])->name('workshops.my');
     Route::get('/workshops/{workshop}', [\App\Http\Controllers\Teacher\WorkshopController::class, 'show'])->name('workshops.show');
     Route::post('/workshops/{workshop}/join', [\App\Http\Controllers\Teacher\WorkshopController::class, 'join'])->name('workshops.join');
+    Route::post('/workshops/{workshop}/enroll', [\App\Http\Controllers\Teacher\WorkshopController::class, 'join'])->name('workshops.enroll');
 
     // Sequential Learning & Modules
     Route::get('/workshops/{workshop}/modules/{module}', [\App\Http\Controllers\Teacher\LearningController::class, 'show'])->name('learning.module');

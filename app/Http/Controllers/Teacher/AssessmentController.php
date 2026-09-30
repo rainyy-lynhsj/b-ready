@@ -10,6 +10,7 @@ use App\Models\Certification;
 use App\Models\Module;
 use App\Models\ModuleProgress;
 use App\Models\Workshop;
+use App\Models\WorkshopTeacher;
 use App\Services\AssessmentEvaluationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -26,13 +27,26 @@ class AssessmentController extends Controller
      * Display the assessment questionnaire or gating screen.
      * Unlocking Rule: Evaluate if all required modules have module_progress.status == 'completed' (100% completion).
      */
-    public function show(Request $request, Workshop $workshop): View
+    public function show(Request $request, Workshop $workshop): View|RedirectResponse
     {
         $teacher = $request->user();
         $assessment = $workshop->assessment;
 
         if (! $assessment) {
             abort(404, "No assessment is assigned to this workshop.");
+        }
+
+        // Must enroll in workshop first before taking assessment
+        $isEnrolled = WorkshopTeacher::where('workshop_id', $workshop->id)
+            ->where(function ($q) use ($teacher) {
+                $q->where('teacher_id', $teacher->id)->orWhere('user_id', $teacher->id);
+            })
+            ->whereIn('status', ['registered', 'completed'])
+            ->exists();
+
+        if (! $isEnrolled) {
+            return redirect()->route('teacher.workshops.show', $workshop)
+                ->with('warning', "You must enroll in {$workshop->title} and complete all course modules before attempting the final assessment.");
         }
 
         Gate::authorize('view', $assessment);

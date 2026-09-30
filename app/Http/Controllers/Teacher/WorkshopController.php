@@ -240,6 +240,11 @@ class WorkshopController extends Controller
         $package = $workshop->classroomPackage;
         $isPackageUnlocked = $certification !== null;
 
+        $firstModule = $modules->sortBy('sequence')->first();
+        $firstUnlockedItem = $modulesWithAccess->first(fn($item) => $item->is_unlocked && ! $item->is_completed)
+            ?? $modulesWithAccess->firstWhere('is_unlocked', true);
+        $firstUnlockedModule = $firstUnlockedItem ? $firstUnlockedItem->module : null;
+
         return view('teacher.workshops.show', compact(
             'workshop',
             'isEnrolled',
@@ -251,13 +256,16 @@ class WorkshopController extends Controller
             'latestAttempt',
             'certification',
             'package',
-            'isPackageUnlocked'
+            'isPackageUnlocked',
+            'firstModule',
+            'firstUnlockedModule'
         ));
     }
 
     /**
      * Enroll the authenticated teacher in a workshop.
      * Inserts a record into workshop_teachers (user_id, workshop_id). Prevents duplicate entries.
+     * Automatically redirects the teacher to the first module in sequence.
      */
     public function join(Request $request, Workshop $workshop): RedirectResponse
     {
@@ -288,6 +296,7 @@ class WorkshopController extends Controller
 
         // Pre-initialize ModuleProgress for first module
         $modules = $workshop->ordered_modules;
+        $firstModule = null;
         if ($modules->isNotEmpty()) {
             $firstModule = $modules->sortBy('sequence')->first();
             if ($firstModule) {
@@ -306,7 +315,13 @@ class WorkshopController extends Controller
             }
         }
 
+        // Directly redirect to Module 1 if modules exist, fulfilling "enroll first then proceed the modules starting at first"
+        if ($firstModule && ! $request->boolean('stay_on_overview')) {
+            return redirect()->route('teacher.learning.module', [$workshop, $firstModule])
+                ->with('success', "You have successfully enrolled in {$workshop->title}! Your training course begins with Module {$firstModule->sequence}: {$firstModule->title}.");
+        }
+
         return redirect()->route('teacher.workshops.show', $workshop)
-            ->with('success', "You have successfully joined {$workshop->title}! Your training modules are ready.");
+            ->with('success', "You have successfully enrolled in {$workshop->title}! Your training modules are ready.");
     }
 }

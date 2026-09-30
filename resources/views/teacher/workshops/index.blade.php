@@ -143,14 +143,14 @@
                             @elseif ($deadlinePassed)
                                 <button type="button" disabled 
                                         class="flex-1 py-2 px-3 rounded-xl bg-slate-100 text-xs font-bold text-slate-400 cursor-not-allowed border border-slate-200">
-                                    Closed
+                                    Enrollment Closed
                                 </button>
                             @else
-                                <form method="POST" action="{{ route('teacher.workshops.join', $workshop) }}" class="flex-1">
+                                <form method="POST" action="{{ route('teacher.workshops.enroll', $workshop) }}" class="flex-1">
                                     @csrf
                                     <button type="submit" 
                                             class="w-full py-2 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-xs font-bold text-white transition-colors shadow-xs">
-                                        Join Workshop
+                                        Enroll in Workshop
                                     </button>
                                 </form>
                             @endif

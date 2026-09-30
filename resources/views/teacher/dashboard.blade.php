@@ -399,7 +399,7 @@
             <div class="space-y-4">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h3 class="text-lg font-bold text-slate-900">Available Workshops to Join</h3>
+                        <h3 class="text-lg font-bold text-slate-900">Available Workshops to Enroll In</h3>
                         <p class="text-xs text-slate-500">Expand your disaster preparedness accreditation.</p>
                     </div>
                     <a href="{{ route('teacher.workshops.index') }}" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
@@ -421,10 +421,10 @@
                                 <span class="text-[11px] text-slate-500">
                                     Starts {{ $av->start_date ? $av->start_date->format('M d') : 'Flexible' }}
                                 </span>
-                                <form method="POST" action="{{ route('teacher.workshops.join', $av) }}">
+                                <form method="POST" action="{{ route('teacher.workshops.enroll', $av) }}">
                                     @csrf
                                     <button type="submit" class="px-3 py-1.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-2xs transition-colors">
-                                        Join Workshop
+                                        Enroll in Workshop
                                     </button>
                                 </form>
                             </div>

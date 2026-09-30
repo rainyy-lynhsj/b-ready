@@ -7,6 +7,7 @@ use App\Models\Material;
 use App\Models\Module;
 use App\Models\ModuleProgress;
 use App\Models\Workshop;
+use App\Models\WorkshopTeacher;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -19,9 +20,23 @@ class LearningController extends Controller
      * Display the sequential module viewer with material preview and accordion list.
      * Enforces Strict Sequencing Rule: If Module N-1 status != 'completed', mark Module N as Locked.
      */
-    public function show(Request $request, Workshop $workshop, Module $module): View
+    public function show(Request $request, Workshop $workshop, Module $module): View|RedirectResponse
     {
         $teacher = $request->user();
+
+        // Must enroll first to take the course and access modules
+        $isEnrolled = WorkshopTeacher::where('workshop_id', $workshop->id)
+            ->where(function ($q) use ($teacher) {
+                $q->where('teacher_id', $teacher->id)->orWhere('user_id', $teacher->id);
+            })
+            ->whereIn('status', ['registered', 'completed'])
+            ->exists();
+
+        if (! $isEnrolled) {
+            return redirect()->route('teacher.workshops.show', $workshop)
+                ->with('warning', "You must enroll in {$workshop->title} first before accessing course modules.");
+        }
+
         Gate::authorize('view', [$module, $workshop]);
 
         $workshop->load(['trainer', 'course.modules.materials']);

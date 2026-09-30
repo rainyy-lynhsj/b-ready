@@ -41,30 +41,47 @@ test('teacher can browse available workshops', function () {
 });
 
 test('teacher can view my workshops', function () {
-    $teacher = User::where('email', 'teacher@example.com')->first();
+    $teacher = User::where('email', 'certified.teacher@example.com')->first();
 
     $response = $this->actingAs($teacher)->get(route('teacher.workshops.my'));
 
     $response->assertOk();
     $response->assertSee('My Enrolled Workshops');
-    $response->assertSee('NCR Regional Teachers Earthquake Preparedness');
+    $response->assertSee('Comprehensive Typhoon & Flood Safety');
 });
 
-test('teacher can enroll in an open workshop', function () {
+test('teacher can enroll in an open workshop and starts at module 1', function () {
     $teacher = User::factory()->create([
         'role' => 'teacher',
         'email_verified_at' => now(),
     ]);
 
     $workshop = Workshop::where('status', 'published')->first();
+    $firstModule = $workshop->ordered_modules->sortBy('sequence')->first();
 
     $response = $this->actingAs($teacher)->post(route('teacher.workshops.join', ['workshop' => $workshop->id]));
 
-    $response->assertRedirect(route('teacher.workshops.show', ['workshop' => $workshop->id]));
+    if ($firstModule) {
+        $response->assertRedirect(route('teacher.learning.module', ['workshop' => $workshop->id, 'module' => $firstModule->id]));
+    } else {
+        $response->assertRedirect(route('teacher.workshops.show', ['workshop' => $workshop->id]));
+    }
+
     $this->assertDatabaseHas('workshop_teachers', [
         'workshop_id' => $workshop->id,
         'teacher_id' => $teacher->id,
     ]);
+});
+
+test('teacher cannot access module without enrolling first', function () {
+    $teacher = User::factory()->create(['role' => 'teacher', 'email_verified_at' => now()]);
+    $workshop = Workshop::where('status', 'published')->first();
+    $firstModule = $workshop->ordered_modules->sortBy('sequence')->first();
+
+    $response = $this->actingAs($teacher)->get(route('teacher.learning.module', ['workshop' => $workshop->id, 'module' => $firstModule->id]));
+
+    $response->assertRedirect(route('teacher.workshops.show', ['workshop' => $workshop->id]));
+    $response->assertSessionHas('warning');
 });
 
 test('sequential learning policy blocks skipping ahead to locked module', function () {
@@ -91,11 +108,28 @@ test('sequential learning policy blocks skipping ahead to locked module', functi
 });
 
 test('teacher completing module 1 unlocks module 2', function () {
-    $teacher = User::where('email', 'teacher@example.com')->first();
+    $teacher = User::factory()->create(['role' => 'teacher', 'email_verified_at' => now()]);
     $workshop1 = Workshop::where('title', 'like', '%Earthquake%')->first();
+    $mod1 = $workshop1->course->modules->where('sequence', 1)->first();
     $mod2 = $workshop1->course->modules->where('sequence', 2)->first();
 
-    // In seeder, mod 1 is completed for demo teacher, so mod 2 should be viewable
+    WorkshopTeacher::create([
+        'workshop_id' => $workshop1->id,
+        'teacher_id' => $teacher->id,
+        'user_id' => $teacher->id,
+        'status' => 'registered',
+        'joined_at' => now(),
+    ]);
+
+    ModuleProgress::create([
+        'workshop_id' => $workshop1->id,
+        'module_id' => $mod1->id,
+        'teacher_id' => $teacher->id,
+        'user_id' => $teacher->id,
+        'progress' => 100,
+        'status' => 'completed',
+    ]);
+
     $response = $this->actingAs($teacher)->get(route('teacher.learning.module', ['workshop' => $workshop1->id, 'module' => $mod2->id]));
 
     $response->assertOk();
@@ -140,7 +174,7 @@ test('assessment service evaluates score and issues certificate on passing', fun
 });
 
 test('classroom package is locked for uncertified teacher and accessible for certified teacher', function () {
-    $certifiedTeacher = User::where('email', 'teacher@example.com')->first();
+    $certifiedTeacher = User::where('email', 'certified.teacher@example.com')->first();
     $uncertifiedTeacher = User::factory()->create(['role' => 'teacher', 'email_verified_at' => now()]);
 
     $workshop2 = Workshop::where('title', 'like', '%Typhoon%')->first();
@@ -158,7 +192,7 @@ test('classroom package is locked for uncertified teacher and accessible for cer
 
 test('classroom implementation service dynamically calculates student aggregates', function () {
     $service = app(ClassroomImplementationService::class);
-    $teacher = User::where('email', 'teacher@example.com')->first();
+    $teacher = User::where('email', 'certified.teacher@example.com')->first();
     $workshop2 = Workshop::where('title', 'like', '%Typhoon%')->first();
     $package = $workshop2->classroomPackage;
 
@@ -199,7 +233,7 @@ test('classroom implementation service dynamically calculates student aggregates
 });
 
 test('all teacher blade views render successfully with status 200', function () {
-    $teacher = User::where('email', 'teacher@example.com')->first();
+    $teacher = User::where('email', 'certified.teacher@example.com')->first();
     $workshop1 = Workshop::where('title', 'like', '%Earthquake%')->first();
     $workshop2 = Workshop::where('title', 'like', '%Typhoon%')->first();
     $package2 = $workshop2->classroomPackage;
@@ -216,9 +250,9 @@ test('all teacher blade views render successfully with status 200', function () 
     // 3. Workshop Show
     $this->actingAs($teacher)->get(route('teacher.workshops.show', ['workshop' => $workshop1->id]))->assertOk();
 
-    // 4. Module Show
-    $mod2 = $workshop1->course->modules->where('sequence', 2)->first();
-    $this->actingAs($teacher)->get(route('teacher.learning.module', ['workshop' => $workshop1->id, 'module' => $mod2->id]))->assertOk();
+    // 4. Module Show (workshop 2 module 1 is enrolled for certified teacher)
+    $mod1 = $workshop2->course->modules->where('sequence', 1)->first();
+    $this->actingAs($teacher)->get(route('teacher.learning.module', ['workshop' => $workshop2->id, 'module' => $mod1->id]))->assertOk();
 
     // 5. Assessment Result
     $this->actingAs($teacher)->get(route('teacher.assessments.result', ['workshop' => $workshop2->id, 'attempt' => $attempt->id]))->assertOk();
@@ -240,7 +274,7 @@ test('all teacher blade views render successfully with status 200', function () 
 });
 
 test('personal reports dashboard renders with all four pillars and computed metrics', function () {
-    $teacher = User::where('email', 'teacher@example.com')->first();
+    $teacher = User::where('email', 'certified.teacher@example.com')->first();
 
     $response = $this->actingAs($teacher)->get(route('teacher.reports.index'));
 
@@ -254,10 +288,28 @@ test('personal reports dashboard renders with all four pillars and computed metr
 });
 
 test('teacher interacting with material sets module progress to 100% and status to completed', function () {
-    $teacher = User::where('email', 'teacher@example.com')->first();
+    $teacher = User::factory()->create(['role' => 'teacher', 'email_verified_at' => now()]);
     $workshop1 = Workshop::where('title', 'like', '%Earthquake%')->first();
+    $mod1 = $workshop1->course->modules->where('sequence', 1)->first();
     $mod2 = $workshop1->course->modules->where('sequence', 2)->first();
     $material = $mod2->materials->first();
+
+    WorkshopTeacher::create([
+        'workshop_id' => $workshop1->id,
+        'teacher_id' => $teacher->id,
+        'user_id' => $teacher->id,
+        'status' => 'registered',
+        'joined_at' => now(),
+    ]);
+
+    ModuleProgress::create([
+        'workshop_id' => $workshop1->id,
+        'module_id' => $mod1->id,
+        'teacher_id' => $teacher->id,
+        'user_id' => $teacher->id,
+        'progress' => 100,
+        'status' => 'completed',
+    ]);
 
     $response = $this->actingAs($teacher)->post(route('teacher.learning.material.interact', [
         'workshop' => $workshop1->id,

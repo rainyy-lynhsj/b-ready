@@ -61,14 +61,27 @@
 
                     <div class="mt-5">
                         @if ($isEnrolled)
-                            <span class="block text-center text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 py-2 rounded-xl">
-                                Access Active
-                            </span>
+                            @if ($firstUnlockedModule)
+                                <a href="{{ route('teacher.learning.module', [$workshop, $firstUnlockedModule]) }}"
+                                   class="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-xs font-bold text-white shadow-xs transition-colors flex items-center justify-center gap-1.5">
+                                    <span>{{ $firstUnlockedModule->sequence === 1 ? 'Start Course (Module 1)' : 'Continue to Module ' . $firstUnlockedModule->sequence }}</span>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                                    </svg>
+                                </a>
+                            @else
+                                <span class="block text-center text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 py-2 rounded-xl">
+                                    Enrolled &bull; Access Active
+                                </span>
+                            @endif
                         @else
-                            <form method="POST" action="{{ route('teacher.workshops.join', $workshop) }}">
+                            <form method="POST" action="{{ route('teacher.workshops.enroll', $workshop) }}">
                                 @csrf
-                                <button type="submit" class="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-xs font-bold text-white shadow-xs transition-colors">
-                                    Join Workshop Now
+                                <button type="submit" class="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-xs font-bold text-white shadow-xs transition-colors flex items-center justify-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                    </svg>
+                                    Enroll in Workshop Now
                                 </button>
                             </form>
                         @endif
@@ -87,6 +100,28 @@
                         <p class="text-xs text-slate-500">Modules must be completed sequentially to unlock the final assessment.</p>
                     </div>
                 </div>
+
+                @if (! $isEnrolled)
+                    <div class="p-4 rounded-2xl bg-indigo-50/80 border border-indigo-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <span class="p-2 rounded-xl bg-indigo-600 text-white shrink-0">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                                </svg>
+                            </span>
+                            <div>
+                                <div class="text-xs font-bold text-indigo-950">Enrollment Required to Begin</div>
+                                <div class="text-[11px] text-indigo-800">Enroll first to take this training course. Once enrolled, you will start immediately with Module 1.</div>
+                            </div>
+                        </div>
+                        <form method="POST" action="{{ route('teacher.workshops.enroll', $workshop) }}" class="shrink-0">
+                            @csrf
+                            <button type="submit" class="w-full sm:w-auto px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition-colors flex items-center justify-center gap-1.5">
+                                <span>Enroll Now &rarr;</span>
+                            </button>
+                        </form>
+                    </div>
+                @endif
 
                 @if ($modulesWithAccess->isEmpty())
                     <div class="bg-white rounded-2xl border border-slate-200 p-8 text-center text-slate-500 text-xs">
@@ -150,7 +185,15 @@
                                     <!-- Action Button -->
                                     <div class="shrink-0 flex items-center">
                                         @if (! $isEnrolled)
-                                            <span class="text-xs text-slate-400 font-medium">Enroll to access</span>
+                                            <form method="POST" action="{{ route('teacher.workshops.enroll', $workshop) }}">
+                                                @csrf
+                                                <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold transition-colors">
+                                                    <svg class="w-3.5 h-3.5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                                    </svg>
+                                                    Enroll to Unlock
+                                                </button>
+                                            </form>
                                         @elseif ($item->is_completed)
                                             <a href="{{ route('teacher.learning.module', [$workshop, $mod]) }}"
                                                class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors shadow-2xs">

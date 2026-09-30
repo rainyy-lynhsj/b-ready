@@ -62,6 +62,17 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        // Historical sample teacher holding past certifications & implementations
+        $historicalTeacher = User::updateOrCreate(
+            ['email' => 'certified.teacher@example.com'],
+            [
+                'name' => 'Dr. Elena Rostova',
+                'password' => Hash::make('password'),
+                'role' => 'teacher',
+                'email_verified_at' => now(),
+            ]
+        );
+
         // 2. Course 1: Earthquake & Fire Readiness for Schools
         $course1 = Course::create([
             'trainer_id' => $trainer->id,
@@ -157,35 +168,7 @@ class DatabaseSeeder extends Seeder
         WorkshopModule::create(['workshop_id' => $workshop1->id, 'module_id' => $mod2->id, 'sequence' => 2]);
         WorkshopModule::create(['workshop_id' => $workshop1->id, 'module_id' => $mod3->id, 'sequence' => 3]);
 
-        // Enroll teacher in Workshop 1 with Module 1 completed (100%) and Module 2 in progress (50%)
-        WorkshopTeacher::create([
-            'workshop_id' => $workshop1->id,
-            'teacher_id' => $teacher->id,
-            'user_id' => $teacher->id,
-            'status' => 'registered',
-            'joined_at' => now()->subDays(4),
-        ]);
-
-        ModuleProgress::create([
-            'workshop_id' => $workshop1->id,
-            'module_id' => $mod1->id,
-            'teacher_id' => $teacher->id,
-            'user_id' => $teacher->id,
-            'progress' => 100,
-            'status' => 'completed',
-            'started_at' => now()->subDays(4),
-            'completed_at' => now()->subDays(3),
-        ]);
-
-        ModuleProgress::create([
-            'workshop_id' => $workshop1->id,
-            'module_id' => $mod2->id,
-            'teacher_id' => $teacher->id,
-            'user_id' => $teacher->id,
-            'progress' => 50,
-            'status' => 'in_progress',
-            'started_at' => now()->subDays(2),
-        ]);
+        // Workshop 1 has no pre-enrollment: teachers start by enrolling, then begin at Module 1
 
         // Assessment for Workshop 1
         $assessment1 = Assessment::create([
@@ -323,20 +306,20 @@ class DatabaseSeeder extends Seeder
             'trainer_id' => $trainer->id,
             'title' => 'Comprehensive Typhoon & Flood Safety Workshop',
             'description' => 'Accredited training for teachers in flood-prone districts on early warning protocols and student safety.',
-            'start_date' => now()->subDays(30),
-            'end_date' => now()->subDays(10),
-            'registration_deadline' => now()->subDays(25),
-            'status' => 'completed',
+            'start_date' => now()->subDays(5),
+            'end_date' => now()->addDays(25),
+            'registration_deadline' => now()->addDays(15),
+            'status' => 'published',
         ]);
 
         // Workshop 2 Modules sequence
         WorkshopModule::create(['workshop_id' => $workshop2->id, 'module_id' => $mod2_1->id, 'sequence' => 1]);
 
-        // Mark teacher as completed & certified in Workshop 2
+        // Historical completion & certification attributed to historical teacher
         WorkshopTeacher::create([
             'workshop_id' => $workshop2->id,
-            'teacher_id' => $teacher->id,
-            'user_id' => $teacher->id,
+            'teacher_id' => $historicalTeacher->id,
+            'user_id' => $historicalTeacher->id,
             'status' => 'completed',
             'joined_at' => now()->subDays(28),
         ]);
@@ -344,8 +327,8 @@ class DatabaseSeeder extends Seeder
         ModuleProgress::create([
             'workshop_id' => $workshop2->id,
             'module_id' => $mod2_1->id,
-            'teacher_id' => $teacher->id,
-            'user_id' => $teacher->id,
+            'teacher_id' => $historicalTeacher->id,
+            'user_id' => $historicalTeacher->id,
             'progress' => 100,
             'status' => 'completed',
             'started_at' => now()->subDays(25),
@@ -365,7 +348,7 @@ class DatabaseSeeder extends Seeder
 
         $attempt2 = AssessmentAttempt::create([
             'assessment_id' => $assessment2->id,
-            'teacher_id' => $teacher->id,
+            'teacher_id' => $historicalTeacher->id,
             'attempt_number' => 1,
             'score' => 92.00,
             'percentage' => 92.00,
@@ -376,7 +359,7 @@ class DatabaseSeeder extends Seeder
 
         // Certification issued for Workshop 2
         Certification::create([
-            'teacher_id' => $teacher->id,
+            'teacher_id' => $historicalTeacher->id,
             'workshop_id' => $workshop2->id,
             'assessment_attempt_id' => $attempt2->id,
             'certificate_number' => 'BRD-2026-TF9284K',
@@ -402,9 +385,9 @@ class DatabaseSeeder extends Seeder
             'sequence' => 1,
         ]);
 
-        // Classroom Implementation logged by Demo Teacher for Workshop 2
+        // Classroom Implementation logged for historical teacher for Workshop 2
         $implementation1 = ClassroomImplementation::create([
-            'teacher_id' => $teacher->id,
+            'teacher_id' => $historicalTeacher->id,
             'workshop_id' => $workshop2->id,
             'classroom_package_id' => $package2->id,
             'implementation_date' => now()->subDays(7),
@@ -452,7 +435,27 @@ class DatabaseSeeder extends Seeder
             'status' => 'published',
         ]);
 
-        Workshop::create([
+        $mod3_1 = Module::create([
+            'course_id' => $course3->id,
+            'title' => 'Chemistry Lab Safety & Hazardous Spill Containment',
+            'description' => 'Storage classifications, SDS sheets, and neutralizing chemical spills.',
+            'learning_objectives' => "Identify toxic chemicals and proper containment methods.",
+            'estimated_duration' => 35,
+            'sequence' => 1,
+            'is_required' => true,
+        ]);
+
+        $mod3_2 = Module::create([
+            'course_id' => $course3->id,
+            'title' => 'Fire Extinguisher P.A.S.S. Method & Suppression Drills',
+            'description' => 'Operating Class A, B, and C fire extinguishers in school environments.',
+            'learning_objectives' => "Master the Pull-Aim-Squeeze-Sweep technique safely.",
+            'estimated_duration' => 45,
+            'sequence' => 2,
+            'is_required' => true,
+        ]);
+
+        $workshop3 = Workshop::create([
             'course_id' => $course3->id,
             'trainer_id' => $trainer->id,
             'title' => 'Fire Prevention & Lab Safety Masterclass 2026',
@@ -462,5 +465,8 @@ class DatabaseSeeder extends Seeder
             'registration_deadline' => now()->addDays(12),
             'status' => 'published',
         ]);
+
+        WorkshopModule::create(['workshop_id' => $workshop3->id, 'module_id' => $mod3_1->id, 'sequence' => 1]);
+        WorkshopModule::create(['workshop_id' => $workshop3->id, 'module_id' => $mod3_2->id, 'sequence' => 2]);
     }
 }
