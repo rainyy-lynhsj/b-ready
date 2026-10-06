@@ -14,8 +14,9 @@ class Module extends Model
         'title',
         'description',
         'learning_objectives',
-        'duration',
+        'estimated_duration',
         'sequence',
+        'is_required',
     ];
 
     /**
@@ -23,7 +24,7 @@ class Module extends Model
      */
     public function course()
     {
-        return $this->belongsTo(User::class, 'course_id');
+        return $this->belongsTo(Course::class, 'course_id');
     }
 
     /**
@@ -36,7 +37,7 @@ class Module extends Model
     }
 
     /**
-     * Workshop assignments contraining this module.
+     * Workshop assignments containing this module.
      */
     public function workshopModules()
     {
@@ -53,7 +54,7 @@ class Module extends Model
     {
         return $this->hasMany(
             ModuleProgress::class,
-            'module_id;'
+            'module_id'
         );
     }
 }
