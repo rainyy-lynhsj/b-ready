@@ -1,8 +1,11 @@
 <x-app-layout>
 
     <x-slot name="header">
+
         <div class="flex items-center justify-between">
+
             <div>
+
                 <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                     {{ __('Trainer Dashboard') }}
                 </h2>
@@ -10,16 +13,38 @@
                 <p class="text-sm text-gray-500 mt-1">
                     Manage your training courses and learning materials.
                 </p>
+
             </div>
+
+
+            {{-- Courses Button --}}
+            <div>
+
+                <a
+                    href="{{ route('trainer.courses.index') }}"
+                    class="inline-flex items-center px-4 py-2 bg-gray-800
+                           border border-transparent rounded-md font-semibold
+                           text-xs text-white uppercase tracking-widest
+                           hover:bg-gray-700"
+                >
+                    Courses
+                </a>
+
+            </div>
+
         </div>
+
     </x-slot>
+
 
     <div class="py-10">
 
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
+
             {{-- Welcome Message --}}
             <div class="bg-white shadow-sm sm:rounded-lg mb-6">
+
                 <div class="p-6">
 
                     <h3 class="text-2xl font-bold text-gray-800">
@@ -32,14 +57,17 @@
                     </p>
 
                 </div>
+
             </div>
 
 
             {{-- Statistics --}}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 
+
                 {{-- Total Courses --}}
                 <div class="bg-white shadow-sm sm:rounded-lg">
+
                     <div class="p-6">
 
                         <p class="text-sm font-medium text-gray-500">
@@ -51,11 +79,13 @@
                         </p>
 
                     </div>
+
                 </div>
 
 
                 {{-- Total Modules --}}
                 <div class="bg-white shadow-sm sm:rounded-lg">
+
                     <div class="p-6">
 
                         <p class="text-sm font-medium text-gray-500">
@@ -67,11 +97,13 @@
                         </p>
 
                     </div>
+
                 </div>
 
 
                 {{-- Published Courses --}}
                 <div class="bg-white shadow-sm sm:rounded-lg">
+
                     <div class="p-6">
 
                         <p class="text-sm font-medium text-gray-500">
@@ -83,11 +115,13 @@
                         </p>
 
                     </div>
+
                 </div>
 
 
                 {{-- Draft Courses --}}
                 <div class="bg-white shadow-sm sm:rounded-lg">
+
                     <div class="p-6">
 
                         <p class="text-sm font-medium text-gray-500">
@@ -99,6 +133,7 @@
                         </p>
 
                     </div>
+
                 </div>
 
             </div>
@@ -109,9 +144,12 @@
 
                 <div class="p-6">
 
+
+                    {{-- My Courses Header --}}
                     <div class="flex items-center justify-between mb-6">
 
                         <div>
+
                             <h3 class="text-lg font-semibold text-gray-800">
                                 My Courses
                             </h3>
@@ -119,7 +157,20 @@
                             <p class="text-sm text-gray-500 mt-1">
                                 Courses created by you.
                             </p>
+
                         </div>
+
+
+                        {{-- Manage Courses Button --}}
+                        <a
+                            href="{{ route('trainer.courses.index') }}"
+                            class="inline-flex items-center px-4 py-2
+                                   bg-indigo-600 border border-transparent
+                                   rounded-md font-semibold text-xs text-white
+                                   uppercase tracking-widest hover:bg-indigo-700"
+                        >
+                            Manage Courses
+                        </a>
 
                     </div>
 
@@ -134,21 +185,28 @@
 
                                     <tr>
 
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th class="px-6 py-3 text-left text-xs
+                                                   font-medium text-gray-500
+                                                   uppercase tracking-wider">
                                             Course
                                         </th>
 
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th class="px-6 py-3 text-left text-xs
+                                                   font-medium text-gray-500
+                                                   uppercase tracking-wider">
                                             Modules
                                         </th>
 
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th class="px-6 py-3 text-left text-xs
+                                                   font-medium text-gray-500
+                                                   uppercase tracking-wider">
                                             Status
                                         </th>
 
                                     </tr>
 
                                 </thead>
+
 
                                 <tbody class="bg-white divide-y divide-gray-200">
 
@@ -182,19 +240,25 @@
 
                                                 @if ($course->status === 'published')
 
-                                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                                    <span class="px-2 py-1 text-xs
+                                                                 font-semibold rounded-full
+                                                                 bg-green-100 text-green-800">
                                                         Published
                                                     </span>
 
                                                 @elseif ($course->status === 'unpublished')
 
-                                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                                                    <span class="px-2 py-1 text-xs
+                                                                 font-semibold rounded-full
+                                                                 bg-gray-100 text-gray-800">
                                                         Unpublished
                                                     </span>
 
                                                 @else
 
-                                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                                    <span class="px-2 py-1 text-xs
+                                                                 font-semibold rounded-full
+                                                                 bg-yellow-100 text-yellow-800">
                                                         Draft
                                                     </span>
 
@@ -212,6 +276,7 @@
 
                         </div>
 
+
                     @else
 
                         <div class="text-center py-10">
@@ -223,6 +288,23 @@
                             <p class="text-sm text-gray-400 mt-2">
                                 Create your first training course to get started.
                             </p>
+
+
+                            {{-- Create First Course --}}
+                            <div class="mt-5">
+
+                                <a
+                                    href="{{ route('trainer.courses.create') }}"
+                                    class="inline-flex items-center px-4 py-2
+                                           bg-gray-800 border border-transparent
+                                           rounded-md font-semibold text-xs
+                                           text-white uppercase tracking-widest
+                                           hover:bg-gray-700"
+                                >
+                                    Create Your First Course
+                                </a>
+
+                            </div>
 
                         </div>
 

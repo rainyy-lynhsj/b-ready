@@ -19,26 +19,22 @@ class Module extends Model
         'is_required',
     ];
 
-    /**
-     * The course this module belongs to.
-     */
     public function course()
     {
-        return $this->belongsTo(Course::class, 'course_id');
+        return $this->belongsTo(
+            Course::class,
+            'course_id'
+        );
     }
 
-    /**
-     * Training materials belonging to this module.
-     */
     public function materials()
     {
-        return $this->hasMany(Material::class, 'module_id')
-            ->orderBy('sequence');
+        return $this->hasMany(
+            Material::class,
+            'module_id'
+        );
     }
 
-    /**
-     * Workshop assignments containing this module.
-     */
     public function workshopModules()
     {
         return $this->hasMany(
@@ -47,9 +43,6 @@ class Module extends Model
         );
     }
 
-    /**
-     * Teacher progress records for this module.
-     */
     public function progress()
     {
         return $this->hasMany(
