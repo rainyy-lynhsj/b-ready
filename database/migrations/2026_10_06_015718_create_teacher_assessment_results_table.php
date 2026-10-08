@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('teacher_assessment_results', function (Blueprint $table) {
             $table->id();
+            $table->string('teacher_name')->default('Trainer / Teacher');
+            $table->integer('score');
+            $table->integer('total_questions');
+            $table->boolean('is_passed');
             $table->timestamps();
         });
     }

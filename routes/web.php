@@ -110,8 +110,40 @@ Route::post('/trainer/grade-assessment', function (Request $request) {
         ];
     }
 
-    return view('trainer.score-result', compact('score', 'totalQuestions', 'detailedResults'));
+    // Kalkulahin kung umabot sa 75% passing rate
+    $percentage = $totalQuestions > 0 ? ($score / $totalQuestions) * 100 : 0;
+    $isPassed = $percentage >= 75;
+
+    // I-save ang resulta sa database para lumabas sa Reports
+    \App\Models\TeacherAssessmentResult::create([
+        'teacher_name' => auth()->user()->name ?? 'Trainer / Teacher',
+        'score' => $score,
+        'total_questions' => $totalQuestions,
+        'is_passed' => $isPassed,
+    ]);
+
+    return view('trainer.score-result', compact('score', 'totalQuestions', 'detailedResults', 'isPassed'));
 });
+
+
+// ==========================================
+// REPORTS
+// ==========================================
+
+
+// Ruta para sa Trainer Reports
+Route::get('/trainer/reports', function () {
+    // Pansamantalang kukunin ang lahat ng assessment results mula sa database
+    $results = \App\Models\TeacherAssessmentResult::all();
+    
+    // Pagkalkula ng mga estadistika
+    $totalTakers = $results->count();
+    $passedCount = $results->where('is_passed', true)->count();
+    $passingRate = $totalTakers > 0 ? round(($passedCount / $totalTakers) * 100, 1) : 0;
+
+    return view('trainer.reports', compact('results', 'totalTakers', 'passedCount', 'passingRate'));
+});
+
 
 
 // ==========================================
