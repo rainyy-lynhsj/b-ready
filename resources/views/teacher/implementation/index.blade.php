@@ -66,7 +66,7 @@
                             <tr>
                                 <th class="p-4">Implementation Date</th>
                                 <th class="p-4">Associated Workshop</th>
-                                <th class="p-4">Classroom Package</th>
+                                <th class="p-4">Workshop Repository</th>
                                 <th class="p-4 text-center">Students Reached</th>
                                 <th class="p-4 text-center">Passed / Failed</th>
                                 <th class="p-4 text-center">Pass Rate</th>

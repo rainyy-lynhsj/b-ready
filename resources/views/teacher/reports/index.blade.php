@@ -81,13 +81,13 @@
                     </div>
                 </div>
                 <a href="{{ route('teacher.workshops.my') }}" class="text-xs font-bold text-indigo-600 hover:text-indigo-800">
-                    Manage Enrollments &rarr;
+                    Manage Registrations &rarr;
                 </a>
             </div>
 
             @if ($trainingProgress->isEmpty())
                 <div class="bg-white rounded-2xl border border-dashed border-slate-300 p-8 text-center text-xs text-slate-500">
-                    You have not enrolled in any disaster risk reduction workshops yet.
+                    You have not registered for any disaster risk reduction workshops yet.
                     <div class="mt-3">
                         <a href="{{ route('teacher.workshops.index') }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 text-white font-bold text-xs shadow-xs hover:bg-indigo-700">
                             Discover Workshops
@@ -308,7 +308,7 @@
                                 @if ($cert->workshop->classroomPackage)
                                     <a href="{{ route('teacher.packages.show', $cert->workshop->classroomPackage) }}"
                                        class="py-2 px-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-indigo-700 font-bold text-xs transition-colors shadow-2xs">
-                                        Toolkit
+                                        Repository
                                     </a>
                                 @endif
                             </div>
@@ -368,7 +368,7 @@
             <!-- Implementation Past Logs -->
             @if ($implementations->isEmpty())
                 <div class="bg-white rounded-2xl border border-dashed border-slate-300 p-8 text-center text-xs text-slate-500">
-                    No classroom implementations recorded yet. Once you obtain your DRR certification, roll out the lesson package with your learners and log scores here!
+                    No classroom implementations recorded yet. Once you obtain your DRR certification, roll out the workshop repository materials with your learners and log scores here!
                 </div>
             @else
                 <div class="space-y-4">

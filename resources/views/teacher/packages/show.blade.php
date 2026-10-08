@@ -1,5 +1,5 @@
 <x-dynamic-component component="layouts.teacher">
-    <x-slot name="title">{{ $package->title }} &bull; Classroom Package</x-slot>
+    <x-slot name="title">{{ $package->title }} &bull; Workshop Repository</x-slot>
     <x-slot name="header">{{ $package->title }}</x-slot>
 
     <div class="space-y-6">
@@ -10,7 +10,7 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                 </svg>
-                Back to Classroom Packages
+                Back to Workshop Repository
             </a>
 
             <span class="text-xs font-semibold text-slate-500">
@@ -18,13 +18,13 @@
             </span>
         </div>
 
-        <!-- Package Overview Card -->
+        <!-- Repository Overview Card -->
         <div class="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-xs">
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 <div class="max-w-3xl">
                     <div class="flex items-center gap-2">
                         <span class="text-xs font-bold text-sky-700 bg-sky-50 border border-sky-100 rounded-md px-2.5 py-1">
-                            Classroom Toolkit
+                            Workshop Repository
                         </span>
                         @if ($isUnlocked)
                             <span class="inline-flex items-center gap-1 text-xs font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-300 px-3 py-1 rounded-full shadow-2xs">
@@ -45,7 +45,7 @@
                     </h2>
 
                     <p class="mt-2 text-sm text-slate-600 leading-relaxed">
-                        {{ $package->description ?? 'Official teaching toolkit containing comprehensive lesson plans, student manuals, emergency drill sheets, and assessment answer keys.' }}
+                        {{ $package->description ?? 'Official workshop repository containing comprehensive lesson plans, student manuals, emergency drill sheets, and assessment answer keys.' }}
                     </p>
 
                     <div class="mt-4 text-xs text-slate-500">
@@ -87,9 +87,9 @@
                         </svg>
                     </div>
                     <div>
-                        <h3 class="text-lg font-bold text-slate-900">Physical Classroom Guides are Gated</h3>
+                        <h3 class="text-lg font-bold text-slate-900">Workshop Repository Materials are Gated</h3>
                         <p class="text-xs sm:text-sm text-amber-800 mt-1 leading-relaxed">
-                            To ensure educational fidelity and disaster safety compliance, classroom packages and student manuals are unlocked only after you successfully complete all required modules and achieve a passing score on the final assessment.
+                            To ensure educational fidelity and disaster safety compliance, workshop repository materials and student manuals are unlocked only after you successfully complete all required modules and achieve a passing score on the final assessment.
                         </p>
                     </div>
                 </div>
@@ -107,7 +107,7 @@
         <div class="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-xs space-y-6">
             <div class="flex items-center justify-between border-b border-slate-100 pb-4">
                 <div>
-                    <h3 class="text-base font-bold text-slate-900">Included Classroom Assets</h3>
+                    <h3 class="text-base font-bold text-slate-900">Included Repository Assets</h3>
                     <p class="text-xs text-slate-500">Student manuals, facilitator outlines, emergency drills, and grading keys.</p>
                 </div>
                 <span class="text-xs font-semibold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
@@ -117,7 +117,7 @@
 
             @if ($package->materials->isEmpty())
                 <div class="p-8 text-center text-xs text-slate-400 border border-dashed border-slate-200 rounded-xl">
-                    No classroom materials currently registered for this package.
+                    No repository materials currently registered.
                 </div>
             @else
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

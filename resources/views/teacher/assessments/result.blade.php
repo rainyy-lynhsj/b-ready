@@ -59,7 +59,7 @@
                     @if ($workshop->classroomPackage)
                         <a href="{{ route('teacher.packages.show', $workshop->classroomPackage) }}"
                            class="inline-flex items-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-5 py-2.5 shadow-xs transition-colors">
-                            Unlock Classroom Package &rarr;
+                            Open Workshop Repository &rarr;
                         </a>
                     @endif
                 @else

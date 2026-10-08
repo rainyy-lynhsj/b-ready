@@ -40,18 +40,18 @@
                 <!-- Right Action Block -->
                 <div class="lg:w-72 shrink-0 p-5 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col justify-between">
                     <div>
-                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Your Enrollment</span>
+                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Your Registration</span>
                         @if ($isEnrolled)
                             <div class="mt-2 flex items-center gap-2 text-emerald-700 font-bold text-sm">
                                 <span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
                                 Active Learner
                             </div>
                             <div class="text-[11px] text-slate-500 mt-1">
-                                Enrolled on {{ $enrollment->joined_at ? $enrollment->joined_at->format('M d, Y') : now()->format('M d, Y') }}
+                                Registered on {{ $enrollment->joined_at ? $enrollment->joined_at->format('M d, Y') : now()->format('M d, Y') }}
                             </div>
                         @else
                             <div class="mt-2 text-sm font-semibold text-slate-700">
-                                Not enrolled yet
+                                Not registered yet
                             </div>
                             <div class="text-[11px] text-slate-500 mt-1">
                                 Registration Deadline: {{ $workshop->registration_deadline ? $workshop->registration_deadline->format('M d, Y') : 'Open' }}
@@ -71,17 +71,17 @@
                                 </a>
                             @else
                                 <span class="block text-center text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 py-2 rounded-xl">
-                                    Enrolled &bull; Access Active
+                                    Registered &bull; Access Active
                                 </span>
                             @endif
                         @else
-                            <form method="POST" action="{{ route('teacher.workshops.enroll', $workshop) }}">
+                            <form method="POST" action="{{ route('teacher.workshops.register', $workshop) }}">
                                 @csrf
                                 <button type="submit" class="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-xs font-bold text-white shadow-xs transition-colors flex items-center justify-center gap-2">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                     </svg>
-                                    Enroll in Workshop Now
+                                    Register for Workshop Now
                                 </button>
                             </form>
                         @endif
@@ -110,14 +110,14 @@
                                 </svg>
                             </span>
                             <div>
-                                <div class="text-xs font-bold text-indigo-950">Enrollment Required to Begin</div>
-                                <div class="text-[11px] text-indigo-800">Enroll first to take this training course. Once enrolled, you will start immediately with Module 1.</div>
+                                <div class="text-xs font-bold text-indigo-950">Registration Required to Begin</div>
+                                <div class="text-[11px] text-indigo-800">Register first to take this training course. Once registered, you will start immediately with Module 1.</div>
                             </div>
                         </div>
-                        <form method="POST" action="{{ route('teacher.workshops.enroll', $workshop) }}" class="shrink-0">
+                        <form method="POST" action="{{ route('teacher.workshops.register', $workshop) }}" class="shrink-0">
                             @csrf
                             <button type="submit" class="w-full sm:w-auto px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition-colors flex items-center justify-center gap-1.5">
-                                <span>Enroll Now &rarr;</span>
+                                <span>Register Now &rarr;</span>
                             </button>
                         </form>
                     </div>
@@ -185,13 +185,13 @@
                                     <!-- Action Button -->
                                     <div class="shrink-0 flex items-center">
                                         @if (! $isEnrolled)
-                                            <form method="POST" action="{{ route('teacher.workshops.enroll', $workshop) }}">
+                                            <form method="POST" action="{{ route('teacher.workshops.register', $workshop) }}">
                                                 @csrf
                                                 <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold transition-colors">
                                                     <svg class="w-3.5 h-3.5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                                                     </svg>
-                                                    Enroll to Unlock
+                                                    Register to Unlock
                                                 </button>
                                             </form>
                                         @elseif ($item->is_completed)
@@ -240,7 +240,7 @@
 
                     <h4 class="mt-2 text-base font-bold text-slate-900">Final Assessment</h4>
                     <p class="mt-1 text-xs text-slate-500 leading-relaxed">
-                        Demonstrate mastery of disaster readiness concepts to receive your certificate and unlock the classroom activity package.
+                        Demonstrate mastery of disaster readiness concepts to receive your certificate and unlock the workshop repository.
                     </p>
 
                     @if ($assessment)
@@ -298,10 +298,10 @@
                     </div>
                 </div>
 
-                <!-- 2. Classroom Package Card -->
+                <!-- 2. Workshop Repository Card -->
                 <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-sky-700 uppercase tracking-wider">Teaching Toolkit</span>
+                        <span class="text-xs font-bold text-sky-700 uppercase tracking-wider">Workshop Repository</span>
                         @if ($isPackageUnlocked)
                             <span class="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
                                 Unlocked
@@ -313,7 +313,7 @@
                         @endif
                     </div>
 
-                    <h4 class="mt-2 text-base font-bold text-slate-900">Classroom Teaching Package</h4>
+                    <h4 class="mt-2 text-base font-bold text-slate-900">Workshop Repository</h4>
                     <p class="mt-1 text-xs text-slate-500 leading-relaxed">
                         Physical worksheets, teacher guides, student drills, and assessment rubrics for your classroom.
                     </p>
@@ -321,12 +321,12 @@
                     <div class="mt-4">
                         @if ($isPackageUnlocked)
                             <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 mb-3">
-                                <strong>Package Unlocked!</strong> You can now download classroom materials and submit implementation reports.
+                                <strong>Repository Unlocked!</strong> You can now download workshop materials and submit implementation reports.
                             </div>
                             @if ($package)
                                 <a href="{{ route('teacher.packages.show', $package) }}"
                                    class="block w-full text-center py-2 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-2xs transition-colors">
-                                    Open Teaching Package
+                                    Open Workshop Repository
                                 </a>
                             @endif
                         @else

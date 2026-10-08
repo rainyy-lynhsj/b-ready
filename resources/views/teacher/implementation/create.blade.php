@@ -61,7 +61,7 @@
                                     class="block w-full rounded-xl border border-slate-200 bg-slate-50/50 p-2.5 text-xs text-slate-900 focus:border-indigo-500 focus:bg-white focus:outline-hidden focus:ring-1 focus:ring-indigo-500">
                                 @foreach ($eligibleWorkshops as $w)
                                     <option value="{{ $w->id }}" {{ old('workshop_id', $selectedWorkshop->id ?? '') == $w->id ? 'selected' : '' }}>
-                                        {{ $w->title }} ({{ $w->classroomPackage->title ?? 'Classroom Toolkit' }})
+                                        {{ $w->title }} ({{ $w->classroomPackage->title ?? 'Workshop Repository' }})
                                     </option>
                                 @endforeach
                             </select>

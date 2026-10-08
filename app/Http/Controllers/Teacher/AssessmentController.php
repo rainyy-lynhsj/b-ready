@@ -46,7 +46,7 @@ class AssessmentController extends Controller
 
         if (! $isEnrolled) {
             return redirect()->route('teacher.workshops.show', $workshop)
-                ->with('warning', "You must enroll in {$workshop->title} and complete all course modules before attempting the final assessment.");
+                ->with('warning', "You must register for {$workshop->title} and complete all course modules before attempting the final assessment.");
         }
 
         Gate::authorize('view', $assessment);
@@ -135,7 +135,7 @@ class AssessmentController extends Controller
 
         if ($result['passed']) {
             return redirect()->route('teacher.assessments.result', [$workshop, $attempt])
-                ->with('success', "Outstanding! You scored {$result['percentage']}% ({$result['correct_answers']}/{$result['total_questions']} correct) and PASSED the final assessment! Your certification has been issued and the Classroom Implementation Package is now UNLOCKED.");
+                ->with('success', "Outstanding! You scored {$result['percentage']}% ({$result['correct_answers']}/{$result['total_questions']} correct) and PASSED the final assessment! Your certification has been issued and the Workshop Repository is now UNLOCKED.");
         }
 
         $remaining = $result['remaining_attempts'];

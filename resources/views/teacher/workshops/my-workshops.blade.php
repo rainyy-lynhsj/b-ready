@@ -1,6 +1,6 @@
 <x-dynamic-component component="layouts.teacher">
     <x-slot name="title">My Workshops</x-slot>
-    <x-slot name="header">My Enrolled Workshops</x-slot>
+    <x-slot name="header">My Registered Workshops</x-slot>
 
     <div class="space-y-6" x-data="{ activeTab: 'active' }">
         <!-- Tab Navigation Bar -->
@@ -117,7 +117,7 @@
                     </div>
                     <h3 class="mt-3 text-sm font-bold text-slate-900">No completed workshops yet</h3>
                     <p class="mt-1 text-xs text-slate-500 max-w-sm mx-auto">
-                        Complete all modules and pass the final exam in your enrolled workshops to unlock official certifications.
+                        Complete all modules and pass the final exam in your registered workshops to unlock official certifications.
                     </p>
                 </div>
             @else
@@ -159,7 +159,7 @@
                                 @if ($item->workshop->classroomPackage)
                                     <a href="{{ route('teacher.packages.show', $item->workshop->classroomPackage) }}"
                                        class="flex-1 text-center py-2 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-xs font-bold text-white transition-colors shadow-2xs">
-                                        Teaching Package
+                                        Workshop Repository
                                     </a>
                                 @endif
                             </div>

@@ -27,11 +27,12 @@ Route::middleware(['auth', 'verified', 'role:teacher'])->prefix('teacher')->name
     // Personal Reports Dashboard (Aggregating Progress, Assessments, Certifications, Implementations)
     Route::get('/reports', [\App\Http\Controllers\Teacher\ReportController::class, 'index'])->name('reports.index');
 
-    // Workshop Discovery & Enrollment
+    // Workshop Discovery & Registration
     Route::get('/workshops', [\App\Http\Controllers\Teacher\WorkshopController::class, 'index'])->name('workshops.index');
     Route::get('/my-workshops', [\App\Http\Controllers\Teacher\WorkshopController::class, 'myWorkshops'])->name('workshops.my');
     Route::get('/workshops/{workshop}', [\App\Http\Controllers\Teacher\WorkshopController::class, 'show'])->name('workshops.show');
     Route::post('/workshops/{workshop}/join', [\App\Http\Controllers\Teacher\WorkshopController::class, 'join'])->name('workshops.join');
+    Route::post('/workshops/{workshop}/register', [\App\Http\Controllers\Teacher\WorkshopController::class, 'join'])->name('workshops.register');
     Route::post('/workshops/{workshop}/enroll', [\App\Http\Controllers\Teacher\WorkshopController::class, 'join'])->name('workshops.enroll');
 
     // Sequential Learning & Modules

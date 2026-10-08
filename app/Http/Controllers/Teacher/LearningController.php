@@ -34,7 +34,7 @@ class LearningController extends Controller
 
         if (! $isEnrolled) {
             return redirect()->route('teacher.workshops.show', $workshop)
-                ->with('warning', "You must enroll in {$workshop->title} first before accessing course modules.");
+                ->with('warning', "You must register for {$workshop->title} first before accessing course modules.");
         }
 
         Gate::authorize('view', [$module, $workshop]);

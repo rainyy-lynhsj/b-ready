@@ -51,12 +51,12 @@ class EnsureTeacherCertified
             if (! $isCertified) {
                 if ($request->expectsJson()) {
                     return response()->json([
-                        'message' => 'Classroom package is locked. You must pass the workshop final assessment to unlock materials.',
+                        'message' => 'Workshop repository is locked. You must pass the workshop final assessment to unlock materials.',
                     ], 403);
                 }
 
                 return redirect()->route('teacher.workshops.show', $workshopId)
-                    ->with('warning', 'Classroom Implementation Package is LOCKED. You must pass the Final Assessment and obtain official certification first.');
+                    ->with('warning', 'Workshop Repository is LOCKED. You must pass the Final Assessment and obtain official certification first.');
             }
         }
 

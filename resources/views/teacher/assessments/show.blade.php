@@ -88,7 +88,7 @@
                 </div>
                 <h3 class="text-xl font-bold text-slate-900">Maximum Attempts Exceeded</h3>
                 <p class="text-xs text-slate-600 max-w-md mx-auto">
-                    You have utilized all {{ $assessment->max_attempts }} allowed attempts for this assessment. Please contact your trainer ({{ $workshop->trainer->email ?? 'DRR Trainer' }}) to request re-enrollment or remedial consultation.
+                    You have utilized all {{ $assessment->max_attempts }} allowed attempts for this assessment. Please contact your trainer ({{ $workshop->trainer->email ?? 'DRR Trainer' }}) to request re-registration or remedial consultation.
                 </p>
 
                 <!-- Previous Attempts Table -->

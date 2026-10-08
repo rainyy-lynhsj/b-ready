@@ -1,12 +1,12 @@
 <x-dynamic-component component="layouts.teacher">
-    <x-slot name="title">Classroom Packages</x-slot>
-    <x-slot name="header">Classroom Teaching Packages</x-slot>
+    <x-slot name="title">Workshop Repository</x-slot>
+    <x-slot name="header">Workshop Repository</x-slot>
 
     <div class="space-y-6">
         <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
-                <h2 class="text-lg font-bold text-slate-900">Teaching Kits & Classroom Toolkits</h2>
-                <p class="text-xs text-slate-500">Download lesson guides, student activity worksheets, and drills for your school.</p>
+                <h2 class="text-lg font-bold text-slate-900">Workshop Repositories & Teaching Kits</h2>
+                <p class="text-xs text-slate-500">Download repository materials, lesson guides, and classroom toolkits for your school.</p>
             </div>
             <a href="{{ route('teacher.implementations.create') }}" 
                class="inline-flex items-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2.5 transition-colors shadow-2xs">
@@ -21,9 +21,9 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                     </svg>
                 </div>
-                <h3 class="mt-3 text-sm font-bold text-slate-900">No classroom packages available</h3>
+                <h3 class="mt-3 text-sm font-bold text-slate-900">No workshop repositories available</h3>
                 <p class="mt-1 text-xs text-slate-500">
-                    Enroll in DRR workshops to access their associated teaching toolkits and lesson manuals.
+                    Register for DRR workshops to access their associated workshop repository materials and lesson manuals.
                 </p>
                 <a href="{{ route('teacher.workshops.index') }}" class="mt-4 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-semibold text-white hover:bg-indigo-700 transition-colors">
                     Browse Workshops
@@ -61,7 +61,7 @@
                             </h3>
 
                             <p class="mt-2 text-xs text-slate-600 line-clamp-3 leading-relaxed">
-                                {{ $pkg->description ?? 'Comprehensive teaching package featuring student manual, activity worksheets, assessment rubrics, and answer keys.' }}
+                                {{ $pkg->description ?? 'Comprehensive workshop repository featuring student manual, activity worksheets, assessment rubrics, and answer keys.' }}
                             </p>
 
                             <div class="mt-4 p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs text-slate-600 flex items-center justify-between">
@@ -73,7 +73,7 @@
                         <div class="mt-5 pt-4 border-t border-slate-100 flex items-center gap-2">
                             <a href="{{ route('teacher.packages.show', $pkg) }}"
                                class="w-full text-center py-2 px-4 rounded-xl text-xs font-bold transition-colors {{ $isCertified ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-2xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200' }}">
-                                {{ $isCertified ? 'Access Toolkit &rarr;' : 'View Requirements' }}
+                                {{ $isCertified ? 'Access Repository &rarr;' : 'View Requirements' }}
                             </a>
                         </div>
                     </div>

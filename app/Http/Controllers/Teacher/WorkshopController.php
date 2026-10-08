@@ -281,7 +281,7 @@ class WorkshopController extends Controller
 
         if ($existing && in_array($existing->status, ['registered', 'completed'])) {
             return redirect()->route('teacher.workshops.show', $workshop)
-                ->with('info', "You are already enrolled in {$workshop->title}.");
+                ->with('info', "You are already registered for {$workshop->title}.");
         }
 
         // Insert record into workshop_teachers (user_id, workshop_id)
@@ -318,10 +318,10 @@ class WorkshopController extends Controller
         // Directly redirect to Module 1 if modules exist, fulfilling "enroll first then proceed the modules starting at first"
         if ($firstModule && ! $request->boolean('stay_on_overview')) {
             return redirect()->route('teacher.learning.module', [$workshop, $firstModule])
-                ->with('success', "You have successfully enrolled in {$workshop->title}! Your training course begins with Module {$firstModule->sequence}: {$firstModule->title}.");
+                ->with('success', "You have successfully registered for {$workshop->title}! Your training course begins with Module {$firstModule->sequence}: {$firstModule->title}.");
         }
 
         return redirect()->route('teacher.workshops.show', $workshop)
-            ->with('success', "You have successfully enrolled in {$workshop->title}! Your training modules are ready.");
+            ->with('success', "You have successfully registered for {$workshop->title}! Your training modules are ready.");
     }
 }

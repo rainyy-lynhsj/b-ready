@@ -13,7 +13,7 @@
                     Welcome back, {{ auth()->user()->name }}!
                 </h2>
                 <p class="mt-2 text-sm sm:text-base text-indigo-100/90 leading-relaxed">
-                    Access your enrolled Disaster Risk Reduction workshops, complete sequential modules, earn your certification, and download teaching packages for your classroom.
+                    Access your registered Disaster Risk Reduction workshops, complete sequential modules, earn your certification, and access workshop repositories for your classroom.
                 </p>
                 <div class="mt-5 flex flex-wrap gap-3">
                     <a href="{{ route('teacher.workshops.my') }}" 
@@ -43,10 +43,10 @@
 
         <!-- 5 Metric Cards (Including Dynamic Class Average) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            <!-- Metric 1: Enrolled Workshops -->
+            <!-- Metric 1: Registered Workshops -->
             <div class="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between">
                 <div class="flex items-center justify-between">
-                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Enrolled Workshops</span>
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Registered Workshops</span>
                     <div class="h-9 w-9 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
@@ -399,7 +399,7 @@
             <div class="space-y-4">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h3 class="text-lg font-bold text-slate-900">Available Workshops to Enroll In</h3>
+                        <h3 class="text-lg font-bold text-slate-900">Available Workshops to Register For</h3>
                         <p class="text-xs text-slate-500">Expand your disaster preparedness accreditation.</p>
                     </div>
                     <a href="{{ route('teacher.workshops.index') }}" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
@@ -421,10 +421,10 @@
                                 <span class="text-[11px] text-slate-500">
                                     Starts {{ $av->start_date ? $av->start_date->format('M d') : 'Flexible' }}
                                 </span>
-                                <form method="POST" action="{{ route('teacher.workshops.enroll', $av) }}">
+                                <form method="POST" action="{{ route('teacher.workshops.register', $av) }}">
                                     @csrf
                                     <button type="submit" class="px-3 py-1.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-2xs transition-colors">
-                                        Enroll in Workshop
+                                        Register for Workshop
                                     </button>
                                 </form>
                             </div>

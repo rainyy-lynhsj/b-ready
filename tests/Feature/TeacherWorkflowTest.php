@@ -46,7 +46,7 @@ test('teacher can view my workshops', function () {
     $response = $this->actingAs($teacher)->get(route('teacher.workshops.my'));
 
     $response->assertOk();
-    $response->assertSee('My Enrolled Workshops');
+    $response->assertSee('My Registered Workshops');
     $response->assertSee('Comprehensive Typhoon & Flood Safety');
 });
 
@@ -187,7 +187,7 @@ test('classroom package is locked for uncertified teacher and accessible for cer
     // Certified teacher (already seeded with certification for workshop 2) should have access
     $okResponse = $this->actingAs($certifiedTeacher)->get(route('teacher.packages.show', ['package' => $package->id]));
     $okResponse->assertOk();
-    $okResponse->assertSee('Classroom Package');
+    $okResponse->assertSee('Workshop Repository');
 });
 
 test('classroom implementation service dynamically calculates student aggregates', function () {
