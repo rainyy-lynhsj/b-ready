@@ -10,6 +10,7 @@ class Workshop extends Model
     use HasFactory;
 
     protected $fillable = [
+        'course_id',
         'trainer_id',
         'title',
         'description',
@@ -17,7 +18,6 @@ class Workshop extends Model
         'end_date',
         'registration_deadline',
         'assessment_id',
-        'invite_link',
     ];
 
     protected function casts(): array
@@ -75,6 +75,14 @@ class Workshop extends Model
         return $this->belongsTo(
             Assessment::class,
             'assessment_id'
+        );
+    }
+
+    public function course()
+    {
+        return $this->belongsTo(
+            Course::class,
+            'course_id'
         );
     }
 }

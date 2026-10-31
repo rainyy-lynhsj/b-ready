@@ -5,6 +5,7 @@ use App\Http\Controllers\TrainerController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\MaterialController;
+use App\Http\Controllers\WorkshopController; 
 use Illuminate\Support\Facades\Route;
 
 
@@ -178,6 +179,38 @@ Route::middleware([
         '/trainer/courses/{courseId}/modules/{moduleId}/materials/{materialId}',
         [MaterialController::class, 'destroy']
     )->name('trainer.materials.destroy');
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Workshop Routes
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/trainer/workshops',
+        [WorkshopController::class, 'index']
+    )->name('trainer.workshops.index');
+
+    Route::get(
+        '/trainer/workshops/create',
+        [WorkshopController::class, 'create']
+    )->name('trainer.workshops.create');
+
+    Route::post(
+        '/trainer/workshops',
+        [WorkshopController::class, 'store']
+    )->name('trainer.workshops.store');
+
+    Route::get(
+        '/trainer/workshops/{workshop}/modules',
+        [WorkshopController::class, 'editModules']
+    )->name('trainer.workshops.modules.edit');
+
+    Route::put(
+        '/trainer/workshops/{workshop}/modules',
+        [WorkshopController::class, 'updateModules']
+    )->name('trainer.workshops.modules.update');
 
 });
 

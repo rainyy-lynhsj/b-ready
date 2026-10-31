@@ -15,6 +15,15 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                
+                @if (Auth::user()->role === 'trainer')
+                    <x-nav-link
+                        :href="route('trainer.workshops.index')"
+                        :active="request()->routeIs('trainer.workshops.*')"
+                    >
+                        {{ __('My Workshops') }}
+                    </x-nav-link>
+                @endif
                 </div>
             </div>
 
@@ -70,6 +79,14 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+                @if (Auth::user()->role === 'trainer')
+                    <x-responsive-nav-link
+                        :href="route('trainer.workshops.index')"
+                        :active="request()->routeIs('trainer.workshops.*')"
+                    >
+                        {{ __('My Workshops') }}
+                    </x-responsive-nav-link>
+                @endif
         </div>
 
         <!-- Responsive Settings Options -->
