@@ -28,7 +28,7 @@ class ClassroomImplementation extends Model
     {
         return [
             'implementation_date' => 'date',
-            'stundents_participated' => 'integer',
+            'students_participated' => 'integer',
             'students_completed_assessment' => 'integer',
             'students_passed' => 'integer',
             'students_failed' => 'integer',
@@ -39,15 +39,15 @@ class ClassroomImplementation extends Model
     {
         return $this->belongsTo(
             User::class,
-            'teacher_id',
+            'teacher_id'
         );
     }
 
     public function workshop()
     {
-        return $this->belongsTO(
+        return $this->belongsTo(
             Workshop::class,
-            'workshop_id',
+            'workshop_id'
         );
     }
 
@@ -55,7 +55,7 @@ class ClassroomImplementation extends Model
     {
         return $this->belongsTo(
             ClassroomPackage::class,
-            'classroom_implemantation_id',
+            'classroom_package_id'
         );
     }
 
@@ -63,7 +63,22 @@ class ClassroomImplementation extends Model
     {
         return $this->hasMany(
             StudentResult::class,
-            'classroom_implementation_id',
+            'classroom_implementation_id'
         );
+    }
+
+    public function getTotalStudentsReachedAttribute(): int
+    {
+        return (int) $this->students_participated;
+    }
+
+    public function getStudentsCompletedAttribute(): int
+    {
+        return (int) $this->students_completed_assessment;
+    }
+
+    public function getClassAveragePercentageAttribute(): float
+    {
+        return (float) round($this->studentResults()->avg('percentage') ?? 0.0, 2);
     }
 }

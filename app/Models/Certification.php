@@ -11,17 +11,22 @@ class Certification extends Model
 
     protected $fillable = [
         'teacher_id',
+        'workshop_id',
         'assessment_attempt_id',
         'certificate_number',
-        'badge_path',
-        'certificate_path',
-        'issued_at',
+        'badge_name',
+        'certificate_file',
+        'certified_at',
+        'status',
+        'approved_by',
+        'approved_at',
     ];
 
     protected function casts(): array
     {
         return [
-            'issued_at' => 'datetime',
+            'certified_at' => 'datetime',
+            'approved_at' => 'datetime',
         ];
     }
 
@@ -33,11 +38,24 @@ class Certification extends Model
         );
     }
 
+    public function workshop()
+    {
+        return $this->belongsTo(
+            Workshop::class,
+            'workshop_id'
+        );
+    }
+
     public function assessmentAttempt()
     {
         return $this->belongsTo(
             AssessmentAttempt::class,
             'assessment_attempt_id'
         );
+    }
+
+    public function approver()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
     }
 }

@@ -39,16 +39,16 @@ class CourseController extends Controller
             'learning_objectives' => ['required', 'string'],
             'target_participants' => ['required', 'string'],
             'estimated_duration' => ['required', 'integer', 'min:1'],
-            'status' => ['required', 'in:draft,published,unpublished'],
         ]);
 
         $validated['trainer_id'] = auth()->id();
+        $validated['status'] = 'draft';
 
-        Course::create($validated);
+        $course = Course::create($validated);
 
         return redirect()
-            ->route('trainer.courses.index')
-            ->with('success', 'Course created successfully.');
+            ->route('trainer.modules.create', $course->id)
+            ->with('success', 'Course created! Add your first module below.');
     }
 
     /**
@@ -57,7 +57,11 @@ class CourseController extends Controller
     public function show($id)
     {
         $course = Course::where('trainer_id', auth()->id())
-            ->with('modules')
+            ->with([
+                'workshops',
+                'modules.materials',
+                'modules.quiz.questions.choices',
+            ])
             ->findOrFail($id);
 
         return view('trainer.courses.show', compact('course'));
@@ -88,7 +92,6 @@ class CourseController extends Controller
             'learning_objectives' => ['required', 'string'],
             'target_participants' => ['required', 'string'],
             'estimated_duration' => ['required', 'integer', 'min:1'],
-            'status' => ['required', 'in:draft,published,unpublished'],
         ]);
 
         $course->update($validated);
@@ -96,6 +99,50 @@ class CourseController extends Controller
         return redirect()
             ->route('trainer.courses.show', $course->id)
             ->with('success', 'Course updated successfully.');
+    }
+
+    /**
+     * Publish a course.
+     */
+    public function publish($id)
+    {
+        $course = Course::where('trainer_id', auth()->id())
+            ->findOrFail($id);
+
+        if (! $course->hasReadyModuleQuizzes()) {
+            return back()->withErrors([
+                'publication' => 'Add at least one module and publish a valid quiz for every module before publishing this course.',
+            ]);
+        }
+
+        $course->update(['status' => 'published']);
+
+        return redirect()
+            ->route('trainer.courses.show', $course->id)
+            ->with('success', 'Course published successfully.');
+    }
+
+    /**
+     * Unpublish a course.
+     */
+    public function unpublish($id)
+    {
+        $course = Course::where('trainer_id', auth()->id())
+            ->findOrFail($id);
+
+        if ($course->status !== 'published') {
+            return redirect()
+                ->route('trainer.courses.show', $course->id)
+                ->withErrors([
+                    'publication' => 'Only a published course can be unpublished.'
+                ]);
+        }
+
+        $course->update(['status' => 'unpublished']);
+
+        return redirect()
+            ->route('trainer.courses.show', $course->id)
+            ->with('success', 'Course unpublished successfully.');
     }
 
     /**

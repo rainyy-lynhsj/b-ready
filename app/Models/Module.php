@@ -1,3 +1,4 @@
+
 <?php
 
 namespace App\Models;
@@ -21,20 +22,29 @@ class Module extends Model
 
     public function course()
     {
-        return $this->belongsTo(
-            Course::class,
-            'course_id'
-        );
+        return $this->belongsTo(Course::class, 'course_id');
     }
 
     public function materials()
     {
-        return $this->hasMany(
-            Material::class,
-            'module_id'
-        );
+        return $this->hasMany(Material::class, 'module_id')
+            ->orderBy('sequence');
     }
 
+    public function assessments()
+    {
+        return $this->hasMany(Assessment::class, 'module_id');
+    }
+
+    public function quiz()
+    {
+        return $this->hasOne(Assessment::class, 'module_id')
+            ->whereNull('workshop_id');
+    }
+
+    /**
+     * Workshop assignments containing this module.
+     */
     public function workshopModules()
     {
         return $this->hasMany(

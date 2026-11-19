@@ -10,6 +10,7 @@ class ClassroomPackage extends Model
     use HasFactory;
 
     protected $fillable = [
+        'workshop_id',
         'trainer_id',
         'title',
         'description',
@@ -21,6 +22,14 @@ class ClassroomPackage extends Model
         return [
             'is_published' => 'boolean',
         ];
+    }
+
+    public function workshop()
+    {
+        return $this->belongsTo(
+            Workshop::class,
+            'workshop_id'
+        );
     }
 
     public function trainer()
@@ -38,5 +47,12 @@ class ClassroomPackage extends Model
             'classroom_package_id',
         )->orderBy('sequence');
     }
-    
+
+    public function implementations()
+    {
+        return $this->hasMany(
+            ClassroomImplementation::class,
+            'classroom_package_id'
+        );
+    }
 }

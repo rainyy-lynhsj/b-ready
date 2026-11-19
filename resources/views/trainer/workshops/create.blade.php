@@ -1,116 +1,51 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Create Workshop
-        </h2>
-    </x-slot>
+<x-layouts.trainer>
+    <x-slot name="title">Create Workshop — B-READY</x-slot>
 
-    <div class="py-10">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white shadow-sm sm:rounded-lg p-6">
-
-                @if ($errors->any())
-                    <div class="mb-6 rounded-lg bg-red-100 px-4 py-3 text-red-800">
-                        <p class="font-semibold">Please correct these errors:</p>
-                        <ul class="list-disc list-inside text-sm">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-
-                @if ($courses->isEmpty())
-                    <p class="mb-4 text-gray-700">
-                        You don't have any published courses available for a workshop yet.
-                        Create and publish a course first.
-                    </p>
-
-                    <a href="{{ route('trainer.courses.create') }}"
-                       class="inline-block rounded-md bg-gray-800 px-4 py-2 text-white hover:bg-gray-700">
-                        Create Course
+    <!-- Header Banner -->
+    <div class="bg-white border-b border-slate-200/80">
+        <div class="w-full px-4 py-7 sm:px-6 lg:px-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <!-- Clean Breadcrumbs -->
+                <nav class="flex items-center gap-2 text-xs text-slate-500 mb-2">
+                    <a href="{{ route('trainer.workshops.index') }}" class="hover:text-emerald-600 transition font-medium">
+                        Workshop Management
                     </a>
-                @else
-                    <form method="POST" action="{{ route('trainer.workshops.store') }}">
-                        @csrf
+                    <span>/</span>
+                    <span class="text-slate-800 font-semibold">New Workshop</span>
+                </nav>
 
-                        <div class="mb-5">
-                            <label for="course_id" class="block text-sm font-medium text-gray-700">
-                                Training Course
-                            </label>
-                            <select id="course_id" name="course_id" required
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-                                <option value="">Select a published course</option>
-                                @foreach ($courses as $course)
-                                    <option value="{{ $course->id }}"
-                                        {{ old('course_id') == $course->id ? 'selected' : '' }}>
-                                        {{ $course->title }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+                <div class="flex items-center gap-3">
+                    <h1 class="text-2xl font-bold text-slate-900 tracking-tight">
+                        {{ __('Create Workshop') }}
+                    </h1>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200">
+                        Draft Mode
+                    </span>
+                </div>
+                <p class="text-sm text-slate-500 mt-1">
+                    Schedule a training session, attach a curriculum course, and set registration deadlines for teachers.
+                </p>
+            </div>
 
-                        <div class="mb-5">
-                            <label for="title" class="block text-sm font-medium text-gray-700">
-                                Workshop Title
-                            </label>
-                            <input type="text" id="title" name="title"
-                                   value="{{ old('title') }}" maxlength="255" required
-                                   placeholder="Example: Disaster Preparedness Training - November 2026"
-                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-                        </div>
-
-                        <div class="mb-5">
-                            <label for="description" class="block text-sm font-medium text-gray-700">
-                                Description
-                            </label>
-                            <textarea id="description" name="description" rows="4"
-                                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                                      placeholder="Describe the workshop session.">{{ old('description') }}</textarea>
-                        </div>
-
-                        <div class="mb-5">
-                            <label for="registration_deadline" class="block text-sm font-medium text-gray-700">
-                                Registration Deadline
-                            </label>
-                            <input type="datetime-local" id="registration_deadline"
-                                   name="registration_deadline"
-                                   value="{{ old('registration_deadline') }}" required
-                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-                        </div>
-
-                        <div class="mb-5">
-                            <label for="start_date" class="block text-sm font-medium text-gray-700">
-                                Start Date and Time
-                            </label>
-                            <input type="datetime-local" id="start_date" name="start_date"
-                                   value="{{ old('start_date') }}" required
-                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-                        </div>
-
-                        <div class="mb-6">
-                            <label for="end_date" class="block text-sm font-medium text-gray-700">
-                                End Date and Time
-                            </label>
-                            <input type="datetime-local" id="end_date" name="end_date"
-                                   value="{{ old('end_date') }}" required
-                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-                        </div>
-
-                        <div class="flex items-center justify-end gap-3">
-                            <a href="{{ route('trainer.workshops.index') }}"
-                               class="rounded-md border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                                Cancel
-                            </a>
-
-                            <button type="submit"
-                                    class="rounded-md bg-gray-800 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700">
-                                Create Workshop
-                            </button>
-                        </div>
-                    </form>
-                @endif
+            <!-- Single Back Action on the right side -->
+            <div class="flex items-center gap-2">
+                <a
+                    href="{{ route('trainer.workshops.index') }}"
+                    class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-300 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition shadow-xs"
+                >
+                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Back to Workshops
+                </a>
             </div>
         </div>
     </div>
-</x-app-layout>
+
+    <!-- Workshop Content Layout -->
+    <div class="w-full px-4 sm:px-6 lg:px-8 mt-6">
+        <form method="POST" action="{{ route('trainer.workshops.store') }}">
+            @include('trainer.workshops._form', ['workshop' => null])
+        </form>
+    </div>
+</x-layouts.trainer>

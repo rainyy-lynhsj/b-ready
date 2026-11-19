@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Assessment;
+use App\Models\AssessmentAttempt;
+use App\Models\Certification;
 use App\Models\Course;
+use App\Models\Workshop;
 
 class TrainerController extends Controller
 {
@@ -19,6 +23,24 @@ class TrainerController extends Controller
             ->latest()
             ->get();
 
+        // Get workshops created by the logged-in trainer.
+        $workshops = Workshop::where('trainer_id', $trainerId)
+            ->with('course')
+            ->withCount('workshopTeachers')
+            ->latest('start_date')
+            ->take(5)
+            ->get();
+
+        $workshopCount = Workshop::where('trainer_id', $trainerId)->count();
+
+        $publishedWorkshopCount = Workshop::where('trainer_id', $trainerId)
+            ->where('status', 'published')
+            ->count();
+
+        $pendingCertificatesCount = Certification::where('approval_status', 'pending')
+            ->whereHas('workshop', fn ($query) => $query->where('trainer_id', $trainerId))
+            ->count();
+
         // Count total courses.
         $courseCount = $courses->count();
 
@@ -32,15 +54,32 @@ class TrainerController extends Controller
             ->where('status', 'published')
             ->count();
 
+        // Count quizzes under the trainer's courses.
+        $quizCount = Assessment::whereNotNull('module_id')
+            ->whereHas('module.course', fn ($query) => $query->where('trainer_id', $trainerId))
+            ->count();
+
+        // Count assessment submissions.
+        $submissionCount = AssessmentAttempt::whereHas(
+            'assessment.module.course',
+            fn ($query) => $query->where('trainer_id', $trainerId)
+        )->count();
+
         // Count draft courses.
         $draftCount = $courses
             ->where('status', 'draft')
             ->count();
 
-        return view('dashboard', compact(
+        return view('trainer.dashboard', compact(
             'courses',
+            'workshops',
+            'workshopCount',
+            'publishedWorkshopCount',
+            'pendingCertificatesCount',
             'courseCount',
             'moduleCount',
+            'quizCount',
+            'submissionCount',
             'publishedCount',
             'draftCount'
         ));

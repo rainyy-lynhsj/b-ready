@@ -18,6 +18,9 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'id_number',
+        'id_file_path',
+        'verification_status',
     ];
     
     /**
@@ -36,6 +39,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'must_change_password' => 'boolean',
         ];
     }
 
@@ -93,5 +97,29 @@ class User extends Authenticatable
             ClassroomImplementation::class,
             'teacher_id'
         );
+    }
+
+    /**
+     * DRR Certifications awarded to this Teacher.
+     */
+    public function certifications()
+    {
+        return $this->hasMany(Certification::class, 'teacher_id');
+    }
+
+    /**
+     * Check if user is a trainer.
+     */
+    public function isTrainer(): bool
+    {
+        return $this->role === 'trainer';
+    }
+
+    /**
+     * Check if user is a teacher.
+     */
+    public function isTeacher(): bool
+    {
+        return $this->role === 'teacher';
     }
 }

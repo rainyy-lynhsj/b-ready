@@ -14,6 +14,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'certified.teacher' => \App\Http\Middleware\EnsureTeacherCertified::class,
+            'trainer.password' => \App\Http\Middleware\EnsureTrainerPasswordChanged::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
