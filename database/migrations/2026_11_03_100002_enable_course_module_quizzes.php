@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -13,19 +14,41 @@ return new class extends Migration
             $table->foreignId('workshop_id')->nullable()->change();
         });
 
-        Schema::table('assessment_attempts', function (Blueprint $table) {
-            $table->foreignId('workshop_id')
-                ->nullable()
-                ->after('assessment_id')
-                ->constrained('workshops')
-                ->cascadeOnDelete();
+        // Add workshop_id only if it does not already exist.
+        // This handles the partial changes from the failed migration.
+        if (!Schema::hasColumn('assessment_attempts', 'workshop_id')) {
+            Schema::table('assessment_attempts', function (Blueprint $table) {
+                $table->foreignId('workshop_id')
+                    ->nullable()
+                    ->after('assessment_id')
+                    ->constrained('workshops')
+                    ->cascadeOnDelete();
+            });
+        }
 
-            $table->dropUnique('assessment_attempt_unique');
-            $table->unique(
-                ['assessment_id', 'workshop_id', 'teacher_id', 'attempt_number'],
-                'assessment_attempt_workshop_unique'
-            );
-        });
+        // Create the replacement index before dropping the old index.
+        // This keeps the assessment_id foreign key supported.
+        $indexes = collect(DB::select('SHOW INDEX FROM assessment_attempts'))
+            ->pluck('Key_name');
+
+        if (!$indexes->contains('assessment_attempt_workshop_unique')) {
+            Schema::table('assessment_attempts', function (Blueprint $table) {
+                $table->unique(
+                    ['assessment_id', 'workshop_id', 'teacher_id', 'attempt_number'],
+                    'assessment_attempt_workshop_unique'
+                );
+            });
+        }
+
+        // Drop the old unique index only after the replacement exists.
+        $indexes = collect(DB::select('SHOW INDEX FROM assessment_attempts'))
+            ->pluck('Key_name');
+
+        if ($indexes->contains('assessment_attempt_unique')) {
+            Schema::table('assessment_attempts', function (Blueprint $table) {
+                $table->dropUnique('assessment_attempt_unique');
+            });
+        }
 
         foreach (DB::table('assessments')->whereNotNull('workshop_id')->get(['id', 'workshop_id']) as $assessment) {
             DB::table('assessment_attempts')
@@ -35,6 +58,7 @@ return new class extends Migration
         }
 
         $now = now();
+
         $modules = DB::table('modules')
             ->join('courses', 'courses.id', '=', 'modules.course_id')
             ->select('modules.id as module_id', 'courses.trainer_id', 'modules.title')

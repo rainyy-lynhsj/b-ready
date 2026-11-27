@@ -38,12 +38,12 @@ class DashboardController extends Controller
         $totalInProgress = $totalEnrolled - $totalCompleted;
 
         // Total certifications
-        $certifications = Certification::where(function ($q) use ($teacher) {
-            $q->where('teacher_id', $teacher->id)->orWhere('user_id', $teacher->id);
-        })
+        // Certifications table uses teacher_id, not user_id.
+        $certifications = Certification::where('teacher_id', $teacher->id)
             ->with(['workshop.trainer', 'workshop.classroomPackage', 'assessmentAttempt'])
             ->latest('certified_at')
             ->get();
+
         $totalCertifications = $certifications->count();
 
         // Modules completed count
@@ -54,9 +54,7 @@ class DashboardController extends Controller
             ->count();
 
         // Implementations & Students Reached
-        $implementations = ClassroomImplementation::where(function ($q) use ($teacher) {
-            $q->where('teacher_id', $teacher->id)->orWhere('user_id', $teacher->id);
-        })
+       $implementations = ClassroomImplementation::where('teacher_id', $teacher->id)
             ->with(['workshop', 'classroomPackage', 'studentResults'])
             ->latest('implementation_date')
             ->get();
@@ -66,6 +64,7 @@ class DashboardController extends Controller
 
         // Dynamic Class Average across all teacher implementations
         $implementationIds = $implementations->pluck('id')->toArray();
+
         $overallClassAverage = ! empty($implementationIds)
             ? round((float) StudentResult::whereIn('classroom_implementation_id', $implementationIds)->avg('percentage'), 2)
             : 0.0;
@@ -73,6 +72,7 @@ class DashboardController extends Controller
         // 1. My Training Progress: Workshops joined, modules completed, and progress percentages
         $activeWorkshops = $enrollments->map(function ($enrollment) use ($teacher) {
             $workshop = $enrollment->workshop;
+
             if (! $workshop) {
                 return null;
             }
@@ -97,9 +97,8 @@ class DashboardController extends Controller
             });
 
             // Check certification
-            $hasCertificate = Certification::where(function ($q) use ($teacher) {
-                $q->where('teacher_id', $teacher->id)->orWhere('user_id', $teacher->id);
-            })
+            // Certifications table uses teacher_id, not user_id.
+            $hasCertificate = Certification::where('teacher_id', $teacher->id)
                 ->where('workshop_id', $workshop->id)
                 ->where('status', 'approved')
                 ->exists();
@@ -117,9 +116,7 @@ class DashboardController extends Controller
         })->filter()->values();
 
         // 2. My Assessment: Recent attempt logs, percentages, and final status
-        $recentAttempts = AssessmentAttempt::where(function ($q) use ($teacher) {
-            $q->where('teacher_id', $teacher->id)->orWhere('user_id', $teacher->id);
-        })
+        $recentAttempts = AssessmentAttempt::where('teacher_id', $teacher->id)
             ->with(['assessment.workshop', 'workshop'])
             ->latest('submitted_at')
             ->take(5)

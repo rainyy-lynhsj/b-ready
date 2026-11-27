@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -48,7 +47,7 @@ class Workshop extends Model
     public function teachers()
     {
         return $this->belongsToMany(
-            User::class, 
+            User::class,
             'workshop_teachers',
             'workshop_id',
             'teacher_id'
@@ -57,10 +56,7 @@ class Workshop extends Model
 
     public function workshopTeachers()
     {
-        return $this->hasMany(
-            WorkshopTeacher::class,
-            'workshop_id'
-        );
+        return $this->hasMany(WorkshopTeacher::class, 'workshop_id');
     }
 
     public function workshopModules()
@@ -82,7 +78,7 @@ class Workshop extends Model
     }
 
     /**
-     * Retrieve ordered modules for this workshop, preferring workshop_modules sequence or course modules.
+     * Retrieve ordered modules for this workshop.
      */
     public function getOrderedModulesAttribute()
     {
@@ -90,7 +86,9 @@ class Workshop extends Model
             return $this->modules;
         }
 
-        return $this->course ? $this->course->modules->sortBy('sequence')->values() : collect();
+        return $this->course
+            ? $this->course->modules->sortBy('sequence')->values()
+            : collect();
     }
 
     public function assessment()
@@ -137,12 +135,5 @@ class Workshop extends Model
             'workshop_id'
         );
     }
-
-    public function course()
-    {
-        return $this->belongsTo(
-            Course::class,
-            'course_id'
-        );
-    }
+    
 }

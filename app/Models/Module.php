@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Models;
@@ -27,8 +26,7 @@ class Module extends Model
 
     public function materials()
     {
-        return $this->hasMany(Material::class, 'module_id')
-            ->orderBy('sequence');
+        return $this->hasMany(Material::class, 'module_id');
     }
 
     public function assessments()

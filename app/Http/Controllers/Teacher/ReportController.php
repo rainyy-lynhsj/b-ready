@@ -35,6 +35,7 @@ class ReportController extends Controller
 
         $trainingProgress = $enrollments->map(function ($enrollment) use ($teacher) {
             $workshop = $enrollment->workshop;
+
             if (! $workshop) {
                 return null;
             }
@@ -57,9 +58,8 @@ class ReportController extends Controller
                 return ! in_array($mod->id, $completedModuleIds);
             });
 
-            $certification = Certification::where(function ($q) use ($teacher) {
-                    $q->where('teacher_id', $teacher->id)->orWhere('user_id', $teacher->id);
-                })
+            // Certifications table uses teacher_id, not user_id.
+            $certification = Certification::where('teacher_id', $teacher->id)
                 ->where('workshop_id', $workshop->id)
                 ->first();
 
@@ -77,25 +77,22 @@ class ReportController extends Controller
         })->filter()->values();
 
         // 2. My Assessment: Attempt logs, percentages, and final status
-        $assessmentAttempts = AssessmentAttempt::where(function ($q) use ($teacher) {
-                $q->where('teacher_id', $teacher->id)->orWhere('user_id', $teacher->id);
-            })
+        // Assessment attempts table uses teacher_id, not user_id.
+        $assessmentAttempts = AssessmentAttempt::where('teacher_id', $teacher->id)
             ->with(['assessment.workshop', 'workshop', 'answers'])
             ->latest('submitted_at')
             ->get();
 
         // 3. My Certificate: Badge view, certificate link, and issuance date
-        $certifications = Certification::where(function ($q) use ($teacher) {
-                $q->where('teacher_id', $teacher->id)->orWhere('user_id', $teacher->id);
-            })
+        // Certifications table uses teacher_id, not user_id.
+        $certifications = Certification::where('teacher_id', $teacher->id)
             ->with(['workshop.trainer', 'workshop.classroomPackage', 'assessmentAttempt'])
             ->latest('certified_at')
             ->get();
 
         // 4. My Classroom Implementation: Past logs, aggregate student reach, computed class averages, and written reflections
-        $implementations = ClassroomImplementation::where(function ($q) use ($teacher) {
-                $q->where('teacher_id', $teacher->id)->orWhere('user_id', $teacher->id);
-            })
+        // Classroom implementations table uses teacher_id, not user_id.
+        $implementations = ClassroomImplementation::where('teacher_id', $teacher->id)
             ->with(['workshop', 'classroomPackage', 'studentResults'])
             ->latest('implementation_date')
             ->get();

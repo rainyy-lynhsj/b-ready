@@ -29,7 +29,8 @@ class ClassroomPackagePolicy
     }
 
     /**
-     * Determine whether the teacher has unlocked the package (must have certification).
+     * Determine whether the teacher has unlocked the package.
+     * An approved certification is required.
      */
     public function unlock(User $user, ClassroomPackage $package): bool
     {
@@ -37,10 +38,9 @@ class ClassroomPackagePolicy
             return false;
         }
 
-        return Certification::where(function ($q) use ($user) {
-            $q->where('teacher_id', $user->id)->orWhere('user_id', $user->id);
-        })
+        return Certification::where('teacher_id', $user->id)
             ->where('workshop_id', $package->workshop_id)
+            ->where('status', 'approved')
             ->exists();
     }
 
