@@ -1,6 +1,11 @@
-
 <?php
 
+use App\Http\Controllers\Admin\CourseOversightController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\PermissionController;
+use App\Http\Controllers\Admin\ReportController as AdminReportController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\WorkshopOversightController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\MaterialController;
@@ -39,8 +44,8 @@ Route::get('/', function () {
     }
 
     return match (auth()->user()->role) {
+        'admin' => redirect()->route('admin.dashboard'),
         'trainer' => redirect()->route('trainer.dashboard'),
-        'admin' => redirect()->route('trainer.certificates.pending'),
         default => redirect()->route('teacher.dashboard'),
     };
 });
@@ -52,12 +57,12 @@ Route::get('/', function () {
 */
 
 Route::get('/dashboard', function () {
-    if (auth()->user()->role === 'trainer') {
-        return redirect()->route('trainer.dashboard');
+    if (auth()->user()->role === 'admin') {
+        return redirect()->route('admin.dashboard');
     }
 
-    if (auth()->user()->role === 'admin') {
-        return redirect()->route('trainer.certificates.pending');
+    if (auth()->user()->role === 'trainer') {
+        return redirect()->route('trainer.dashboard');
     }
 
     return redirect()->route('teacher.dashboard');
@@ -65,10 +70,20 @@ Route::get('/dashboard', function () {
 
 /*
 |--------------------------------------------------------------------------
-| Trainer Password Routes
+| Password Change Routes
 |--------------------------------------------------------------------------
 */
 
+Route::middleware(['auth'])->group(function () {
+    Route::get('/change-password', function () {
+        return view('auth.trainer-change-password');
+    })->name('password.change');
+
+    Route::put('/change-password', [PasswordController::class, 'update'])
+        ->name('password.forced.update');
+});
+
+// Backward-compatible trainer password routes
 Route::middleware(['auth', 'role:trainer'])->group(function () {
     Route::get('/trainer/change-password', function () {
         return view('auth.trainer-change-password');
@@ -220,6 +235,7 @@ Route::middleware(['auth', 'role:trainer', 'trainer.password', 'verified'])->gro
         $results = TeacherAssessmentResult::all();
         $totalTakers = $results->count();
         $passedCount = $results->where('is_passed', true)->count();
+
         $passingRate = $totalTakers > 0
             ? round(($passedCount / $totalTakers) * 100, 1)
             : 0;
@@ -272,7 +288,7 @@ Route::middleware(['auth', 'trainer.password', 'verified', 'role:trainer,admin']
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'verified', 'role:teacher'])
+Route::middleware(['auth', 'verified', 'role:teacher', 'trainer.password'])
     ->prefix('teacher')
     ->name('teacher.')
     ->group(function () {
@@ -325,6 +341,12 @@ Route::middleware(['auth', 'verified', 'role:teacher'])
         Route::post('/workshops/{workshop}/modules/{module}/assessment', [AssessmentController::class, 'submitModule'])
             ->name('learning.module.assessment.submit');
 
+        Route::get('/workshops/{workshop}/final-exam', [AssessmentController::class, 'showFinalExam'])
+            ->name('assessments.final');
+
+        Route::post('/workshops/{workshop}/final-exam', [AssessmentController::class, 'submitFinalExam'])
+            ->name('assessments.final.submit');
+
         Route::get('/workshops/{workshop}/assessment/attempts/{attempt}', [AssessmentController::class, 'result'])
             ->name('assessments.result');
 
@@ -363,6 +385,50 @@ Route::middleware(['auth', 'verified', 'role:teacher'])
 
 /*
 |--------------------------------------------------------------------------
+| Admin Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'verified', 'role:admin', 'trainer.password'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+
+        Route::get('/dashboard', [AdminDashboardController::class, 'index'])
+            ->name('dashboard');
+
+        // User & Role Access Management
+        Route::resource('users', AdminUserController::class)->except(['show']);
+
+        Route::patch('users/{user}/toggle-status', [AdminUserController::class, 'toggleStatus'])
+            ->name('users.toggle-status');
+
+        // Permissions Matrix
+        Route::get('/permissions', [PermissionController::class, 'index'])
+            ->name('permissions.index');
+
+        // Platform Oversight
+        Route::get('/workshops', [WorkshopOversightController::class, 'index'])
+            ->name('workshops.index');
+
+        Route::get('/workshops/{workshop}', [WorkshopOversightController::class, 'show'])
+            ->name('workshops.show');
+
+        Route::get('/courses', [CourseOversightController::class, 'index'])
+            ->name('courses.index');
+
+        Route::get('/certificates', [CertificateApprovalController::class, 'index'])
+            ->name('certificates.index');
+
+        Route::post('/certificates/{certification}/approve', [CertificateApprovalController::class, 'approve'])
+            ->name('certificates.approve');
+
+        Route::get('/reports', [AdminReportController::class, 'index'])
+            ->name('reports.index');
+    });
+
+/*
+|--------------------------------------------------------------------------
 | Profile Routes
 |--------------------------------------------------------------------------
 */
@@ -377,11 +443,5 @@ Route::middleware(['auth', 'trainer.password'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])
         ->name('profile.destroy');
 });
-
-/*
-|--------------------------------------------------------------------------
-| Authentication Routes
-|--------------------------------------------------------------------------
-*/
 
 require __DIR__.'/auth.php';

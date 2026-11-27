@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Assessment;
+use App\Models\AssessmentAnswer;
 use App\Models\AssessmentAttempt;
 use App\Models\Certification;
 use App\Models\Choice;
@@ -38,6 +39,7 @@ class DatabaseSeeder extends Seeder
         ClassroomMaterial::truncate();
         ClassroomPackage::truncate();
         Certification::truncate();
+        AssessmentAnswer::truncate();
         AssessmentAttempt::truncate();
         Choice::truncate();
         Question::truncate();
@@ -69,14 +71,17 @@ class DatabaseSeeder extends Seeder
         Storage::disk('public')->put('classroom_packages/answer_key.pdf', $pdfContent);
         Storage::disk('public')->put('classroom_packages/family_gobag.pdf', $pdfContent);
 
-        // 1. Create Demo Teacher & Trainer
+        // 1. Create Demo Teacher & Trainer (Required for existing automated test suite compatibility)
         $teacher = User::updateOrCreate(
             ['email' => 'teacher@example.com'],
             [
                 'name' => 'Maria Santos',
                 'password' => Hash::make('password'),
                 'role' => 'teacher',
+                'is_active' => true,
+                'permissions' => User::defaultPermissionsForRole('teacher'),
                 'email_verified_at' => now(),
+                'must_change_password' => false,
             ]
         );
 
@@ -86,7 +91,50 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Engr. Roberto Cruz',
                 'password' => Hash::make('password'),
                 'role' => 'trainer',
+                'is_active' => true,
+                'permissions' => User::defaultPermissionsForRole('trainer'),
                 'email_verified_at' => now(),
+                'must_change_password' => false,
+            ]
+        );
+
+        // 2. Primary System Accounts (Super Admin, Master Trainer, Lead Teacher)
+        $superAdmin = User::updateOrCreate(
+            ['email' => 'adminbready@gmail.com'],
+            [
+                'name' => 'Administrator',
+                'password' => Hash::make('adminbready123!'),
+                'role' => 'admin',
+                'is_active' => true,
+                'permissions' => array_keys(User::allAvailablePermissions()),
+                'email_verified_at' => now(),
+                'must_change_password' => false,
+            ]
+        );
+
+        $primaryTrainer = User::updateOrCreate(
+            ['email' => 'trainerbready@gmail.com'],
+            [
+                'name' => 'Master Trainer',
+                'password' => Hash::make('trainerbready123!'),
+                'role' => 'trainer',
+                'is_active' => true,
+                'permissions' => User::defaultPermissionsForRole('trainer'),
+                'email_verified_at' => now(),
+                'must_change_password' => false,
+            ]
+        );
+
+        $primaryTeacher = User::updateOrCreate(
+            ['email' => 'teacherbready@gmail.com'],
+            [
+                'name' => 'Teacher Lead',
+                'password' => Hash::make('teacherbready123!'),
+                'role' => 'teacher',
+                'is_active' => true,
+                'permissions' => User::defaultPermissionsForRole('teacher'),
+                'email_verified_at' => now(),
+                'must_change_password' => false,
             ]
         );
 
@@ -116,7 +164,7 @@ class DatabaseSeeder extends Seeder
         $course1 = Course::create([
             'trainer_id' => $trainer->id,
             'title' => 'School Earthquake & Fire Readiness Protocol',
-            'description' => 'Comprehensive disaster preparedness training equipping educators to plan, organize, and execute rapid school evacuation drills.',
+            'description' => 'Comprehensive disaster preparedness training equipping teachers to plan, organize, and execute rapid school evacuation drills.',
             'learning_objectives' => "1. Understand seismic hazard zones and structural vulnerabilities in school facilities.\n2. Master the 'Duck, Cover, and Hold' procedure for classroom settings.\n3. Formulate school incident command teams and post-evacuation headcount procedures.",
             'target_participants' => 'Elementary and High School Teachers, DRRM Focal Coordinators',
             'estimated_duration' => 6,
@@ -243,10 +291,10 @@ class DatabaseSeeder extends Seeder
         WorkshopModule::create(['workshop_id' => $workshop1->id, 'module_id' => $mod2->id, 'sequence' => 2]);
         WorkshopModule::create(['workshop_id' => $workshop1->id, 'module_id' => $mod3->id, 'sequence' => 3]);
 
-        // Assessment for Workshop 1
+        // Assessment for Workshop 1 (Final Examination)
         $assessment1 = Assessment::create([
             'workshop_id' => $workshop1->id,
-            'module_id' => $mod3->id,
+            'module_id' => null,
             'trainer_id' => $trainer->id,
             'title' => 'Final Examination: Earthquake Readiness & School Evacuation Facilitation',
             'description' => 'Evaluation of disaster response principles, teacher leadership during emergency conditions, and drill execution.',
@@ -360,7 +408,7 @@ class DatabaseSeeder extends Seeder
             'title' => 'Hydrometeorological Hazard Mitigation & Typhoon Response',
             'description' => 'Critical protocols for early warning monitoring, flood risk mapping, and safeguarding educational records during extreme weather.',
             'learning_objectives' => "Interpret PAGASA tropical cyclone bulletin signals.\nEstablish contingency plans for low-lying and flood-prone campuses.",
-            'target_participants' => 'All Educators and School DRR Teams',
+            'target_participants' => 'All Teachers and School DRR Teams',
             'estimated_duration' => 5,
             'status' => 'published',
         ]);
@@ -505,15 +553,39 @@ class DatabaseSeeder extends Seeder
 
         $assessment2 = Assessment::create([
             'workshop_id' => $workshop2->id,
-            'module_id' => $mod2_1->id,
+            'module_id' => null,
             'trainer_id' => $trainer->id,
-            'title' => 'Typhoon Preparedness Competency Exam',
+            'title' => 'Final Examination: Typhoon Preparedness Competency Exam',
             'description' => 'Accreditation examination on hydrometeorological risk management.',
-            'passing_score' => 70,
+            'passing_score' => 75,
             'time_limit' => 25,
             'max_attempts' => 3,
             'is_published' => true,
         ]);
+
+        $q2_1 = Question::create([
+            'assessment_id' => $assessment2->id,
+            'question_text' => 'What is the primary action a school DRRM team should take when a Red Rainfall Warning or high Tropical Cyclone Wind Signal is issued?',
+            'question_type' => 'multiple_choice',
+            'points' => 25,
+            'sequence' => 1,
+        ]);
+        Choice::create(['question_id' => $q2_1->id, 'choice_text' => 'Activate flood evacuation protocols, move learners and records to elevated safe zones, and coordinate with LGU authorities.', 'is_correct' => true, 'sequence' => 1]);
+        Choice::create(['question_id' => $q2_1->id, 'choice_text' => 'Continue outdoor physical education classes in low-lying grounds.', 'is_correct' => false, 'sequence' => 2]);
+        Choice::create(['question_id' => $q2_1->id, 'choice_text' => 'Keep electrical main switches on in flooded ground-floor rooms.', 'is_correct' => false, 'sequence' => 3]);
+        Choice::create(['question_id' => $q2_1->id, 'choice_text' => 'Ignore official PAGASA advisories.', 'is_correct' => false, 'sequence' => 4]);
+
+        $q2_2 = Question::create([
+            'assessment_id' => $assessment2->id,
+            'question_text' => 'Before allowing students to re-enter classrooms after floodwaters subside, what must be verified first?',
+            'question_type' => 'multiple_choice',
+            'points' => 25,
+            'sequence' => 2,
+        ]);
+        Choice::create(['question_id' => $q2_2->id, 'choice_text' => 'Structural stability, electrical system safety, and sanitation/disinfection against waterborne hazards.', 'is_correct' => true, 'sequence' => 1]);
+        Choice::create(['question_id' => $q2_2->id, 'choice_text' => 'Only whether the chalkboard is dry.', 'is_correct' => false, 'sequence' => 2]);
+        Choice::create(['question_id' => $q2_2->id, 'choice_text' => 'Whether students brought extra textbooks.', 'is_correct' => false, 'sequence' => 3]);
+        Choice::create(['question_id' => $q2_2->id, 'choice_text' => 'No inspection is required prior to class resumption.', 'is_correct' => false, 'sequence' => 4]);
 
         $attempt2 = AssessmentAttempt::create([
             'assessment_id' => $assessment2->id,
@@ -533,7 +605,7 @@ class DatabaseSeeder extends Seeder
             'workshop_id' => $workshop2->id,
             'assessment_attempt_id' => $attempt2->id,
             'certificate_number' => 'BRD-2026-TF9284K',
-            'badge_name' => 'DRR Certified Educator',
+            'badge_name' => 'DRR Certified Teacher',
             'certified_at' => now()->subDays(15),
             'status' => 'approved',
             'approved_by' => $trainer->id,
@@ -601,7 +673,7 @@ class DatabaseSeeder extends Seeder
         $course3 = Course::create([
             'trainer_id' => $trainer->id,
             'title' => 'Campus Fire Prevention & Chemical Hazard Protocol',
-            'description' => 'Training for educators on chemistry lab safety, fire extinguisher operations, and electrical safety audits.',
+            'description' => 'Training for teachers on chemistry lab safety, fire extinguisher operations, and electrical safety audits.',
             'learning_objectives' => "Master the P.A.S.S. method for fire extinguisher discharge.\nAudit electrical and chemical hazards in school premises.",
             'target_participants' => 'Science Teachers, Lab Custodians, and DRR Focal Persons',
             'estimated_duration' => 4,
@@ -725,6 +797,42 @@ class DatabaseSeeder extends Seeder
         WorkshopModule::create(['workshop_id' => $workshop3->id, 'module_id' => $mod3_2->id, 'sequence' => 2]);
         WorkshopModule::create(['workshop_id' => $workshop3->id, 'module_id' => $mod3_3->id, 'sequence' => 3]);
 
+        $assessment3 = Assessment::create([
+            'workshop_id' => $workshop3->id,
+            'module_id' => null,
+            'trainer_id' => $trainer->id,
+            'title' => 'Final Examination: Fire Prevention & Laboratory Safety Masterclass',
+            'description' => 'Comprehensive final examination covering chemical hazard containment, P.A.S.S. fire extinguisher operation, and smoke evacuation protocols.',
+            'passing_score' => 75,
+            'time_limit' => 30,
+            'max_attempts' => 3,
+            'is_published' => true,
+        ]);
+
+        $q3_1 = Question::create([
+            'assessment_id' => $assessment3->id,
+            'question_text' => 'What does the P.A.S.S. acronym stand for when operating a portable fire extinguisher?',
+            'question_type' => 'multiple_choice',
+            'points' => 25,
+            'sequence' => 1,
+        ]);
+        Choice::create(['question_id' => $q3_1->id, 'choice_text' => 'Pull the pin, Aim at the base of the fire, Squeeze the lever, Sweep side to side.', 'is_correct' => true, 'sequence' => 1]);
+        Choice::create(['question_id' => $q3_1->id, 'choice_text' => 'Push the nozzle, Alert the class, Spray upward, Stop immediately.', 'is_correct' => false, 'sequence' => 2]);
+        Choice::create(['question_id' => $q3_1->id, 'choice_text' => 'Point at the smoke, Activate alarm, Shake canister, Stand back.', 'is_correct' => false, 'sequence' => 3]);
+        Choice::create(['question_id' => $q3_1->id, 'choice_text' => 'Pour water, Assess damage, Shut windows, Sprint outside.', 'is_correct' => false, 'sequence' => 4]);
+
+        $q3_2 = Question::create([
+            'assessment_id' => $assessment3->id,
+            'question_text' => 'When evacuating students through a smoke-filled corridor during a school fire emergency, what is the safest procedure?',
+            'question_type' => 'multiple_choice',
+            'points' => 25,
+            'sequence' => 2,
+        ]);
+        Choice::create(['question_id' => $q3_2->id, 'choice_text' => 'Instruct students to stay low (crawl beneath the smoke layer), cover nose and mouth, and follow the primary or secondary fire exit route to the assembly point.', 'is_correct' => true, 'sequence' => 1]);
+        Choice::create(['question_id' => $q3_2->id, 'choice_text' => 'Have students run upright through thick smoke and use the building elevator.', 'is_correct' => false, 'sequence' => 2]);
+        Choice::create(['question_id' => $q3_2->id, 'choice_text' => 'Open hot doors immediately without checking the handle temperature.', 'is_correct' => false, 'sequence' => 3]);
+        Choice::create(['question_id' => $q3_2->id, 'choice_text' => 'Return to the chemistry laboratory to gather notebooks.', 'is_correct' => false, 'sequence' => 4]);
+
         $package3 = ClassroomPackage::create([
             'workshop_id' => $workshop3->id,
             'trainer_id' => $trainer->id,
@@ -797,6 +905,17 @@ class DatabaseSeeder extends Seeder
                 'choice_text' => 'Wait until the situation ends before reporting a safety concern.',
                 'is_correct' => false,
                 'sequence' => 4,
+            ]);
+        }
+
+        // Enroll teacherbready@gmail.com in Workshop 1
+        if (isset($primaryTeacher) && isset($workshop1)) {
+            WorkshopTeacher::firstOrCreate([
+                'workshop_id' => $workshop1->id,
+                'teacher_id' => $primaryTeacher->id,
+            ], [
+                'status' => 'enrolled',
+                'joined_at' => now()->subDays(2),
             ]);
         }
     }
